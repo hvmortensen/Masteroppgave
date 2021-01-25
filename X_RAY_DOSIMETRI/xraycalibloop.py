@@ -53,6 +53,7 @@ muen_over_rho = 1.075               #ratio of the mass energy absorption coeffic
 pu = 1.02                           #perturbation factor
 kTP = 1.018                         #corrects for the change in temperature and pressure from the calibration to the measurement
 NK = 43.77                          #air kerma calibration factor for the given beam quality
+
 K = NK*ku*muen_over_rho*pu*kTP
 
 DeltaNK = 0.39
