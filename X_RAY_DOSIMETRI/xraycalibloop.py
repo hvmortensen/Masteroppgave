@@ -99,14 +99,15 @@ for i in range(N*n):
     for j in range(m):
         DD[i,j] = np.sqrt( (DC/C[i,j])**2 + (DNK/NK)**2 )*D[i,j]
 
+print (D)
 
 #### UDREGN GENNEMSNITTET AF MÅLINGERNE I HVERT PUNKT OG OMREGN TIL DOSIS ####
 yd = np.zeros(x)                    # dosisgennemsnit for hver y-linje
 ys = np.zeros(x)                    # standardafvig for hver y-linje
-d_matrix = np.zeros( (y, x) )       # 5x6-matrice med dosisgennemsnittene som rækker
-s_matrix = np.zeros( (y, x) )       # 5x6-matrice med standardafvigene som rækker
-D_Matrix = np.zeros( (n, y, x) )    # 3x6x5-matrice med alle forsøgs dosisgennemsnit
-S_Matrix = np.zeros( (n, y, x) )    # 3x6x5-matrice med alle forsøgs standardafvig
+d_matrix = np.zeros( (y, x) )       # 6x5-matrice med dosisgennemsnittene som rækker
+s_matrix = np.zeros( (y, x) )       # 6x5-matrice med standardafvigene som rækker
+D_Matrix = np.zeros( (n, y, x) )    # 3 x 6x5-matrice med hvert enkelt forsøgs dosisgennemsnit i hver sin matrice
+S_Matrix = np.zeros( (n, y, x) )    # 3 x 6x5-matrice med hvert enkelt forsøgs standardafvig i hver sin matrice
 for i in range(n):                              # gå igennem alle forsøg
     for j in range(y):                          # gå igennem alle rækker
         for k in range(x):                      # gå igennem alle målepunkter
@@ -122,17 +123,17 @@ Mean_Of_Total = np.zeros(N)
 Mean_Of_Means = np.zeros(N)
 SE = np.zeros(N)
 SEM = np.zeros(N)
-AllPoints = np.zeros( (n, m) )                      #samtlige enkeltmålinger i hvert punkt
+AllPoints = np.zeros( (n, m) )              #samtlige enkeltmålinger i hvert punkt
 
-for i in range(N):                                  # gå igennem alle målepunkter på perspexpladen: range(N) = 0,1,2,...29
-    PointMeans = np.zeros(n)                        # for hvert målepunkt; lav en 3-array med hver alle målinger i samme punkt
-    for j in range(n):                              # gå igennem alle målinger i hvert punkt: range(n) = 0,1,2
-        AllPoints[j] = D[i + N*j]                   # alle målinger fra alle forsøg
-        PointMeans[j] = np.mean(D[i + N*j])         # fyld n-array med alle gennemsnit i samme punkt
-    Mean_Of_Total[i] = np.mean(AllPoints)           # udregn gennemsnit lav N-array med gennemsnit fra samtlige målinger
-    Mean_Of_Means[i] = np.mean(PointMeans)          # udregn gennemsnit lav N-array med gennemsnit af gennemsnitsdoser i hvert målepunkt
-    SE[i] = np.std(AllPoints)/np.sqrt(n*m)          # udregn SE og lav N-array med SEM i hvert målepunkt
-    SEM[i] = np.std(PointMeans)/np.sqrt(n)          # udregn SEM og lav N-array med SEM i hvert målepunkt
+for i in range(N):                          # gå igennem alle målepunkter på perspexpladen: range(N) = 0,1,2,...29
+    PointMeans = np.zeros(n)                # for hvert målepunkt; lav en 3-array med hver alle målinger i samme punkt
+    for j in range(n):                      # gå igennem alle målinger i hvert punkt: range(n) = 0,1,2
+        AllPoints[j] = D[i + N*j]           # alle målinger fra alle forsøg
+        PointMeans[j] = np.mean(D[i + N*j]) # fyld n-array med alle gennemsnit i samme punkt
+    Mean_Of_Total[i] = np.mean(AllPoints)   # udregn gennemsnit lav N-array med gennemsnit fra samtlige målinger
+    Mean_Of_Means[i] = np.mean(PointMeans)  # udregn gennemsnit lav N-array med gennemsnit af gennemsnitsdoser i hvert målepunkt
+    SE[i] = np.std(AllPoints)/np.sqrt(n*m)  # udregn SE og lav N-array med SEM i hvert målepunkt
+    SEM[i] = np.std(PointMeans)/np.sqrt(n)  # udregn SEM og lav N-array med SEM i hvert målepunkt
 
 ya = np.zeros(x)
 ym = np.zeros(x)
@@ -260,7 +261,6 @@ plt.savefig("%s_%s_gnsnSEogSEM.pdf"%(SSD,t))
 #### PLOT FOR AT SE HVOR MEGET ENKELTE MÅLINGER AFVIGER FRA GENNEMSNITTET AF DE RESTERENDE MÅLINGER
 
 # plt.rc('grid', color='w', linestyle='solid')
-
 titlec = " %s, %ss: m'te måling i hvert punktsæt normaliseret i forhold til gennemsnittet af de resterende målinger i samme sæt"
 ylimits = (0.91, 1.09)
 if m <= 5:
@@ -314,9 +314,6 @@ else:
 
 plt.tight_layout()
 plt.savefig("%s_%s_norm_rest.pdf"%(SSD,t))
-
-
-
 
 
 titlee = "Kalibreringsfaktor $\\delta(t)$ for kort eksponering"
