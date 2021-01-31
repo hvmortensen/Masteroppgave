@@ -92,56 +92,55 @@ m = C.shape[1]          # antal målinger pr punkt
 
 
 #### UDREGN FEJLEN I D (∆D/D)^2 = (∆C/C)**2 + (∆K/K)**2 I HVERT MÅLEPUNKT ####
-# def DD(c_,d_):
-#     return np.sqrt( (DC/c_)**2 + (DNK/NK)**2 )*d_
-DD = np.zeros_like(C)
+
+DD = np.zeros_like(D)   # fejlmatricen ∆D har samme form som dosismatricen D
 for i in range(N*n):
     for j in range(m):
         DD[i,j] = np.sqrt( (DC/C[i,j])**2 + (DNK/NK)**2 )*D[i,j]
 
 
 #### UDREGN GENNEMSNITTET AF MÅLINGERNE I HVERT PUNKT OG OMREGN TIL DOSIS ####
-yd = np.zeros(x)                                # 5-array: dosisgennemsnit for hver y-linje
-ys = np.zeros(x)                                # 5-array: standardafvig for hver y-linje
-d_matrix = np.zeros( (y, x) )                   # 6x5-matrice: dosisgennemsnittene som rækker
-s_matrix = np.zeros( (y, x) )                   # 6x5-matrice: standardafvigene som rækker
-D_Matrix = np.zeros( (n, y, x) )                # 3 6x5-matricer med hvert enkelt forsøgs dosisgennemsnit i hver sin matrice
-S_Matrix = np.zeros( (n, y, x) )                # 3 6x5-matricer med hvert enkelt forsøgs standardafvig i hver sin matrice
+yd = np.zeros(x)                                # 5-array: dosisgnsn for hvert punkt på en y-linje
+ys = np.zeros(x)                                # 5-array: SD for hvert punkt på en y-linje
+d_matrix = np.zeros( (y, x) )                   # 6x5-matrice: dosisgnsn som rækker
+s_matrix = np.zeros( (y, x) )                   # 6x5-matrice: SD som rækker
+D_Matrix = np.zeros( (n, y, x) )                # 3 6x5-matricer med hvert enkelt forsøgs dosisgnsn i hver sin matrice
+S_Matrix = np.zeros( (n, y, x) )                # 3 6x5-matricer med hvert enkelt forsøgs SD i hver sin matrice
 
 # udregn gnsn og SD og fyld matricer til PLOTTING
 for i in range(n):                              # gå igennem alle forsøg
     for j in range(y):                          # gå igennem alle rækker
         for k in range(x):                      # gå igennem alle målepunkter
-            yd[k] = np.mean(D[k + j*x + i*N])   # gennemsnit af hvert punktsæt
-            ys[k] = np.std(D[k + j*x + i*N])    # standardafvig af hvert punktsæt
-        d_matrix[j] = yd                        # 6x5-matrice med gennemsnit
-        s_matrix[j] = ys                        # 6x5-matrice med standardafvig
-    D_Matrix[i] = d_matrix                      # 3 6x5 matricer med gennemsnit til PLOTTING
-    S_Matrix[i] = s_matrix                      # 3 6x5 matricer med standardafvig til PLOTTING
+            yd[k] = np.mean(D[k + j*x + i*N])   # gnsn af hvert punktsæt
+            ys[k] = np.std(D[k + j*x + i*N])    # SD af hvert punktsæt
+        d_matrix[j] = yd                        # 6x5-matrice med gnsn
+        s_matrix[j] = ys                        # 6x5-matrice med SD
+    D_Matrix[i] = d_matrix                      # 3 6x5 matricer med gnsn til PLOTTING
+    S_Matrix[i] = s_matrix                      # 3 6x5 matricer med SD til PLOTTING
 
 #### MATRICER MED GENNEMSNITSDOSIS, SE, OG SEM
-Mean_Of_Total = np.zeros(N)
+Mean_Of_Total = np.zeros(N)     #
 Mean_Of_Means = np.zeros(N)
 SE = np.zeros(N)
 SEM = np.zeros(N)
-AllPoints = np.zeros( (n, m) )              #samtlige enkeltmålinger i hvert punkt
-AllErrors = np.zeros( (n, m) )              #samtlige enkeltmålingers standardfejl i hvert punkt
 
 # udregn gnsn, SE, og SEM
 for i in range(N):                                          # gå igennem alle målepunkter på perspexpladen: range(N) = 0,1,2,...29
-    PointMeans = np.zeros(n)                                # for hvert målepunkt; lav en 3-array med hver alle målinger D i samme punkt
-    PointErrors = np.zeros(n)                               # for hvert målepunkt; lav en 3-array med hver alle standardfejl ∆D i samme punkt
+    AllPoints = np.zeros( (n, m) )                          # for hvert målepunkt; lav en 3-array med hver alle enkeltmålinger D i samme punkt
+    AllErrors = np.zeros( (n, m) )                          # for hvert målepunkt; lav en 3-array med hver alle enkeltfejl ∆D i samme punkt
+    PointMeans = np.zeros(n)                                # for hvert målepunkt; lav en 3-array med hver alle gennemsnitsmålinger <D> i samme punkt
+    PointErrors = np.zeros(n)                               # for hvert målepunkt; lav en 3-array med hver alle gennemsnitsfejl <∆D> i samme punkt
     for j in range(n):                                      # gå igennem alle målinger i hvert punkt: range(n) = 0,1,2
         AllPoints[j] = D[i + N*j]                           # alle enkeltmålinger fra alle forsøg
         AllErrors[j] = DD[i + N*j]                          # alle enkeltmålingers standardfejl fra alle forsøg
-        PointMeans[j] = np.mean(D[i + N*j])                 # fyld n-array med alle gennemsnitsmålinger i samme punkt for hver n
-        PointErrors[j] = np.mean(DD[i + N*j])               # fyld n-array med alle gennemsnits-standardfejl i samme punkt for hver n
-    Mean_Of_Total[i] = np.mean(AllPoints)                   # udregn gennemsnit lav N-array med gennemsnit fra samtlige målinger
-    Mean_Of_Means[i] = np.mean(PointMeans)                  # udregn gennemsnit lav N-array med gennemsnit af gennemsnitsdoser i hvert målepunkt
-    SE[i] = np.sqrt( (np.std(AllPoints)/np.sqrt(n*m))**2\
-                    + np.mean(AllErrors)**2 )               # udregn SE og lav N-array med SEM i hvert målepunkt
-    SEM[i] = np.sqrt( (np.std(PointMeans)/np.sqrt(n))**2\
-                    + np.mean(PointErrors)**2 )             # udregn SEM og lav N-array med SEM i hvert målepunkt
+        PointMeans[j] = np.mean(D[i + N*j])                 # gnsn af alle punktmålinger fra hvert forsøg
+        PointErrors[j] = np.mean(DD[i + N*j])               # gnsn af alle punkters fejl fra hvert forsøg
+    Mean_Of_Total[i] = np.mean(AllPoints)                   # N-matrice med gnsn af alle målinger i hvert målepunkt
+    Mean_Of_Means[i] = np.mean(PointMeans)                  # N-matrice med gnsn af gnsn i hvert målepunkt (skal give samme som ovenstående)
+    SE[i] = np.sqrt( (np.std(AllPoints)/np.sqrt(n*m))**2 \
+                        + np.mean(AllErrors)**2 )           # SE i hvert målepunkt
+    SEM[i] = np.sqrt( (np.std(PointMeans)/np.sqrt(n))**2 \
+                        + np.mean(PointErrors)**2 )         # SEM i hvert målepunkt
 
 ya = np.zeros(x)
 ym = np.zeros(x)
@@ -153,20 +152,20 @@ SE_Matrix = np.zeros( (y, x) )
 SEM_Matrix = np.zeros( (y, x) )
 
 # fyld matricer til PLOTTING
-for i in range(y):                          # gå igennem hver linje på perspexpladen
-    for j in range(x):                      # gå igennem hvert punkt på perspexpladen
-        ya[j] = Mean_Of_Total[j + i*(x)]    # fyld 6 arrays med gennemsnittene af alle målinger
-        ym[j] = Mean_Of_Means[j + i*(x)]    # fyld 6 arrays med gennemsnit af gennemsnittene fra hver forsøg
-        yse[j]  = SE[j + i*(x)]             # fyld 6 arrays med standard error (SE)
-        ysem[j] = SEM[j + i*(x)]            # fyld 6 arrays med standard error of the mean (SEM)
-    DA_Matrix[i] = ya                       # fyld 6x5-dosematrix til plotting
-    DM_Matrix[i] = ym                       # fyld 6x5-dosematrix til plotting
-    SE_Matrix[i] = yse                      # fyld 6x5-SE-matrix til plotting
-    SEM_Matrix[i] = ysem                    # fyld 6x5-SEM-matrix til plotting
+for i in range(y):                      # gå igennem hver linje på perspexpladen
+    for j in range(x):                  # gå igennem hvert punkt på perspexpladen
+        ya[j] = Mean_Of_Total[j + i*x]  # fyld 6 5-arrays (én for hver linje på pladen) med gnsn af alle målinger
+        ym[j] = Mean_Of_Means[j + i*x]  # fyld 6 5-arrays (én for hver linje på pladen) med gnsn af gennemsnittene fra hver forsøg
+        yse[j]  = SE[j + i*x]           # fyld 6 5-arrays (én for hver linje på pladen) med standard error (SE)
+        ysem[j] = SEM[j + i*x]          # fyld 6 5-arrays (én for hver linje på pladen) med standard error of the mean (SEM)
+    DA_Matrix[i] = ya                   # fyld 6x5-dosematrix til plotting
+    DM_Matrix[i] = ym                   # fyld 6x5-dosematrix til plotting
+    SE_Matrix[i] = yse                  # fyld 6x5-SE-matrix til plotting
+    SEM_Matrix[i] = ysem                # fyld 6x5-SEM-matrix til plotting
 
 #### Sikkerhed for at SE og SEM er rigtig udregnet ####
 if DA_Matrix.any() != DM_Matrix.any():
-    print('ADVARSEL!! Gennemssnitsdose udregent fra alle målinger ≠ gennemsnitsdose udregnet fra gennemsnittene')
+    print('ADVARSEL!! Gennemssnitsdose udregnet fra alle målinger ≠ gennemsnitsdose udregnet fra gennemsnittene')
 
 #### NORMALISERING AF ALLE MÅLINGSINDEKS
 #### FOR AT SE HVOR MEGET MERE RØRET GIVER
@@ -251,13 +250,9 @@ axb[0].set_title("Gennemsnitsdosis (mGy)")
 axb[0].invert_yaxis()
 axb[1].imshow(SE_Matrix, vmin=S_min, vmax=S_max, cmap=plt.cm.Blues,interpolation='lanczos')
 axb[1].set_title("Standard error (mGy),\n SE = $\\sqrt{ (\\frac{ SD(D_i) }{ \\sqrt{n\\cdot m} })^2 + \\overline{∆D}^2} $  ")
-#SE = $\\sqrt{\\frac{SD(x_i)^2 + (\overline{∆D})^2}{{m\\cdot n}}}$")
-#SE = $\\frac{np.std([x_1,...,x_{%s}])}{√%s}$  "%(int(n*m), int(n*m)))
 axb[1].invert_yaxis()
 axb[2].imshow(SEM_Matrix, vmin=S_min, vmax=S_max, cmap=plt.cm.Greens,interpolation='lanczos')
-axb[2].set_title("Standard error of the mean (mGy),\n SEm = $\\sqrt{ (\\frac{ SD(\overline{D}_j) }{ \\sqrt{n} })^2 + \\langle\overline{∆D}\\rangle^2} $  ")
-#SEM = $\\sqrt{\\frac{SD(\overline{X}_j)^2 + (\overline{∆D})^2}{{n}}}$")
-#SEM = $\\frac{np.std([\\overline{X}_1,...,\\overline{X}_{%s}])}{√%s}$ " %(n,n))
+axb[2].set_title("Standard error of the mean (mGy),\n SEM = $\\sqrt{ (\\frac{ SD(\overline{D}_j) }{ \\sqrt{n} })^2 + \\langle\overline{∆D}\\rangle^2} $  ")
 axb[2].invert_yaxis()
 for i in range(x):
     for j in range(y):
@@ -365,4 +360,4 @@ print()
 print("antal forsøg kørt: %s " %(n))
 print()
 
-plt.show()
+# plt.show()
