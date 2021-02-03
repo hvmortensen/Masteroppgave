@@ -70,9 +70,9 @@ DNK = 0.39
 DC = 0.02
 
 #### VÆLG TXT.-FIL SOM SKAL KØRES ####
-# filename = 'xray_data_SSD50_20s.txt'; t = 20; SSD = "SSD50"
+filename = 'xray_data_SSD50_20s.txt'; t = 20; SSD = "SSD50"
 # filename = 'xray_data_SSD40_14s.txt'; t = 14; SSD = "SSD40"
-filename = 'xray_data_SSD40_13s.txt'; t = 13; SSD = "SSD40"
+# filename = 'xray_data_SSD40_13s.txt'; t = 13; SSD = "SSD40"
 # filename = 'xray_data_SSD37_5_12s.txt'; t = 12; SSD = "SSD37_5"
 
 # sortér data i kolonner
@@ -90,26 +90,21 @@ N = y*x                 # antal målingspunkter på perspex-pladen = 30 (kan ogs
 n = int(f.max() + 1)    # antal forsøg gjort ( = 3 hvis færdig)
 m = C.shape[1]          # antal målinger pr punkt
 
-
 #### UDREGN FEJLEN I D (∆D/D)^2 = (∆C/C)**2 + (∆K/K)**2 I HVERT MÅLEPUNKT ####
-
 DD = np.zeros_like(D)   # fejlmatricen ∆D har samme form som dosismatricen D
 for i in range(N*n):
     for j in range(m):
         DD[i,j] = np.sqrt( (DC/C[i,j])**2 + (DNK/NK)**2 )*D[i,j]
 
-
 #### UDREGN GENNEMSNITTET AF MÅLINGERNE I HVERT PUNKT OG OMREGN TIL DOSIS ####
-yd = np.zeros(x)                                # 5-array: dosisgnsn for hvert punkt på en y-linje
-ys = np.zeros(x)                                # 5-array: SD for hvert punkt på en y-linje
-d_matrix = np.zeros( (y, x) )                   # 6x5-matrice: dosisgnsn som rækker
-s_matrix = np.zeros( (y, x) )                   # 6x5-matrice: SD som rækker
 D_Matrix = np.zeros( (n, y, x) )                # 3 6x5-matricer med hvert enkelt forsøgs dosisgnsn i hver sin matrice
 S_Matrix = np.zeros( (n, y, x) )                # 3 6x5-matricer med hvert enkelt forsøgs SD i hver sin matrice
-
-# udregn gnsn og SD og fyld matricer til PLOTTING
 for i in range(n):                              # gå igennem alle forsøg
+    d_matrix = np.zeros( (y, x) )                   # 6x5-matrice: dosisgnsn som rækker
+    s_matrix = np.zeros( (y, x) )                   # 6x5-matrice: SD som rækker
     for j in range(y):                          # gå igennem alle rækker
+        yd = np.zeros(x)                                # 5-array: dosisgnsn for hvert punkt på en y-linje
+        ys = np.zeros(x)                                # 5-array: SD for hvert punkt på en y-linje
         for k in range(x):                      # gå igennem alle målepunkter
             yd[k] = np.mean(D[k + j*x + i*N])   # gnsn af hvert punktsæt
             ys[k] = np.std(D[k + j*x + i*N])    # SD af hvert punktsæt
@@ -118,13 +113,11 @@ for i in range(n):                              # gå igennem alle forsøg
     D_Matrix[i] = d_matrix                      # 3 6x5 matricer med gnsn til PLOTTING
     S_Matrix[i] = s_matrix                      # 3 6x5 matricer med SD til PLOTTING
 
-#### MATRICER MED GENNEMSNITSDOSIS, SE, OG SEM
-Mean_Of_Total = np.zeros(N)     #
+#### MATRICER MED GENNEMSNITSDOSIS, SE, OG SEM I HVERT PUNKT
+Mean_Of_Total = np.zeros(N)
 Mean_Of_Means = np.zeros(N)
 SE = np.zeros(N)
 SEM = np.zeros(N)
-
-# udregn gnsn, SE, og SEM
 for i in range(N):                                          # gå igennem alle målepunkter på perspexpladen: range(N) = 0,1,2,...29
     AllPoints = np.zeros( (n, m) )                          # for hvert målepunkt; lav en 3-array med hver alle enkeltmålinger D i samme punkt
     AllErrors = np.zeros( (n, m) )                          # for hvert målepunkt; lav en 3-array med hver alle enkeltfejl ∆D i samme punkt
@@ -137,21 +130,19 @@ for i in range(N):                                          # gå igennem alle m
         PointErrors[j] = np.mean(DD[i + N*j])               # gnsn af alle punkters fejl fra hvert forsøg
     Mean_Of_Total[i] = np.mean(AllPoints)                   # N-matrice med gnsn af alle målinger i hvert målepunkt
     Mean_Of_Means[i] = np.mean(PointMeans)                  # N-matrice med gnsn af gnsn i hvert målepunkt (skal give samme som ovenstående)
-    SE[i] = np.sqrt( (np.std(AllPoints)/np.sqrt(n*m))**2 \
-                        + np.mean(AllErrors)**2 )           # SE i hvert målepunkt
-    SEM[i] = np.sqrt( (np.std(PointMeans)/np.sqrt(n))**2 \
-                        + np.mean(PointErrors)**2 )         # SEM i hvert målepunkt
+    SE[i] = (np.std(AllPoints)/np.sqrt(n*m))                # SE i hvert målepunkt
+    SEM[i] = (np.std(PointMeans)/np.sqrt(n))                # SEM i hvert målepunkt
+    # SE[i] = np.sqrt( (np.std(AllPoints)/np.sqrt(n*m))**2 + np.mean(AllErrors)**2 )      # SE i hvert målepunkt
+    # SEM[i] = np.sqrt( (np.std(PointMeans)/np.sqrt(n))**2 + np.mean(PointErrors)**2 )    # SEM i hvert målepunkt
 
 ya = np.zeros(x)
 ym = np.zeros(x)
 yse = np.zeros(x)
 ysem = np.zeros(x)
-DA_Matrix = np.zeros( (y, x) )
-DM_Matrix = np.zeros( (y, x) )
-SE_Matrix = np.zeros( (y, x) )
-SEM_Matrix = np.zeros( (y, x) )
-
-# fyld matricer til PLOTTING
+DA_Matrix = np.zeros( (y, x) )          # matrice til totalgennemsnit udregnet fra samtlige n*m målinger i hvert punkt
+DM_Matrix = np.zeros( (y, x) )          # matrice til totalgennemsnit udregnet fra n gennemsnit i hvert punkt
+SE_Matrix = np.zeros( (y, x) )          # matrice til SE i hvert punkt
+SEM_Matrix = np.zeros( (y, x) )         # matrice til SEM i hvert punkt
 for i in range(y):                      # gå igennem hver linje på perspexpladen
     for j in range(x):                  # gå igennem hvert punkt på perspexpladen
         ya[j] = Mean_Of_Total[j + i*x]  # fyld 6 5-arrays (én for hver linje på pladen) med gnsn af alle målinger
@@ -184,8 +175,8 @@ for i in range(n*N):                                                        # he
         NormArray_wi[j,i] = norm_wi[i,j]                                    # array med til plotting
 
 #### LILLE PLOT MED KALIBRERINGSFAKTOR FOR FORSKELLIGE EKSPONERINGSTIDER ####
-first_meas_norms = np.array([1.024, 1.023, 1.015, 1.011 ])
-first_meas_sems = np.array([0.007, 0.003, 0.004, 0.002 ])
+first_meas_norms = np.array([1.022, 1.020, 1.012, 1.009 ])
+first_meas_sems = np.array([0.006, 0.003, 0.003, 0.002 ])
 scope = np.array([12, 13, 14, 20])
 
 #### PLOTTING ####
@@ -193,11 +184,19 @@ scope = np.array([12, 13, 14, 20])
 #### PLOTTING ####
 
 #### STRÅLINGSINTENSITETPLOT ####
-#intesitetsregulering i plottene så de bliver ensartede og sammenlignbare
+# intesitetsregulering i plottene så de bliver ensartede og sammenlignbare
+# faste intensitetsværdier på alle fejlplot så de kan sammenlignes på tværs af forsøg
 D_min = D_Matrix.min()
 D_max = D_Matrix.max()
-S_min = 0#S_Matrix.min()
-S_max = 3.5#S_Matrix.max()
+S_min = 1 #S_Matrix.min()
+S_max = 3.3 #S_Matrix.max()
+
+DM_min = D_min
+DM_max = D_max
+SE_min = S_min  # SE_Matrix.min()
+SE_max = S_max  # SE_Matrix.max()
+SEM_min = S_min # SEM_Matrix.min()
+SEM_max = S_max # SEM_Matrix.max()
 
 FS = 14 # fontsixe til superoverskrift
 fs = 9  # fontsize til lengend()
@@ -208,7 +207,7 @@ if n == 1:
     figa, axa = plt.subplots(1,2,figsize=(7,4.5))
     figa.suptitle(titlea%(SSD, t, m), fontsize=FS)
     axa[0].imshow(D_Matrix[0], vmin=D_min, vmax=D_max, cmap='inferno',interpolation='lanczos')#, interpolation='lanczos')
-    axa[0].set_title("Målt dosis (mGy)")
+    axa[0].set_title("Dosis: $\\overline{D}$ (mGy)")
     axa[0].invert_yaxis()
     axa[1].imshow(S_Matrix[0], vmin=S_min, vmax=S_max, cmap=plt.cm.Blues,interpolation='lanczos')#, interpolation='lanczos')
     axa[1].set_title("Standardafvig (mGy)")
@@ -217,16 +216,16 @@ if n == 1:
         for j in range(y):
             c = D_Matrix[0,j,i]
             d = S_Matrix[0,j,i]
-            axa[0].text(i, j, '%.2f' %c, va='bottom', ha='center', fontsize=fs)
-            axa[0].text(i, j, "±"'%.2f' %d, va='top', ha='center', fontsize=fs)
-            axa[1].text(i, j, '%.2f' %d, va='center', ha='center', fontsize=fs)
+            axa[0].text(i, j, '%.1f' %c, va='bottom', ha='center', fontsize=fs)
+            axa[0].text(i, j, "±"'%.1f' %d, va='top', ha='center', fontsize=fs)
+            axa[1].text(i, j, '%.1f' %d, va='center', ha='center', fontsize=fs)
     plt.tight_layout(rect=[0, 0.03, 1, 0.9])
 else:
     figa, axa = plt.subplots(nrows=2,ncols=n,figsize=(12, 8))
     figa.suptitle(titlea%(SSD, t, m), fontsize=FS)
     for i in range(n):
         axa[0,i].imshow(D_Matrix[i], vmin=D_min, vmax=D_max, cmap='inferno',interpolation='lanczos')
-        axa[0,i].set_title("Målt dosis (mGy), %s. forsøg"%(int(i+1)))
+        axa[0,i].set_title("Dosis: $\\overline{D}$ (mGy), %s. forsøg"%(int(i+1)))
         axa[0,i].invert_yaxis()
         axa[1,i].imshow(S_Matrix[i], vmin=S_min, vmax=S_max, cmap=plt.cm.Blues,interpolation='lanczos')
         axa[1,i].set_title("Standardafvig (mGy)")
@@ -235,9 +234,9 @@ else:
             for k in range(y):
                 c = D_Matrix[i,k,j]
                 d = S_Matrix[i,k,j]
-                axa[0,i].text(j, k, '%.2f' %c, va='bottom', ha='center', fontsize=fs)
-                axa[0,i].text(j, k, "±"'%.2f' %d, va='top', ha='center', fontsize=fs)
-                axa[1,i].text(j, k, '%.2f' %d, va='center', ha='center', fontsize=fs)
+                axa[0,i].text(j, k, '%.1f' %c, va='bottom', ha='center', fontsize=fs)
+                axa[0,i].text(j, k, "±"'%.1f' %d, va='top', ha='center', fontsize=fs)
+                axa[1,i].text(j, k, '%.1f' %d, va='center', ha='center', fontsize=fs)
     plt.tight_layout(rect=titlecorrection)
 plt.savefig("%s_%s_dosiogSD.pdf"%(SSD,t))
 
@@ -245,14 +244,14 @@ plt.savefig("%s_%s_dosiogSD.pdf"%(SSD,t))
 titleb = "%s, %ss: %s forsøg, %s målinger pr punkt "
 figb, axb = plt.subplots(nrows=1,ncols=3,figsize=(9.55, 5))
 figb.suptitle(titleb%(SSD, t,n, m), fontsize=FS)
-axb[0].imshow(DM_Matrix, vmin=D_min, vmax=D_max, cmap='inferno',interpolation='lanczos')
-axb[0].set_title("Gennemsnitsdosis (mGy)")
+axb[0].imshow(DM_Matrix, vmin=DM_min, vmax=DM_max, cmap='inferno',interpolation='lanczos')
+axb[0].set_title("Dosis: $\\langle D\\rangle$ (mGy)")
 axb[0].invert_yaxis()
-axb[1].imshow(SE_Matrix, vmin=S_min, vmax=S_max, cmap=plt.cm.Blues,interpolation='lanczos')
-axb[1].set_title("Standard error (mGy),\n SE = $\\sqrt{ (\\frac{ SD(D_i) }{ \\sqrt{n\\cdot m} })^2 + \\overline{∆D}^2} $  ")
+axb[1].imshow(SE_Matrix, vmin=SE_min, vmax=SE_max, cmap=plt.cm.Blues,interpolation='lanczos')
+axb[1].set_title("Standard error (mGy),\n SE = ${ \\frac{ SD(D) }{ \\sqrt{n\\cdot m} }} $  ")
 axb[1].invert_yaxis()
-axb[2].imshow(SEM_Matrix, vmin=S_min, vmax=S_max, cmap=plt.cm.Greens,interpolation='lanczos')
-axb[2].set_title("Standard error of the mean (mGy),\n SEM = $\\sqrt{ (\\frac{ SD(\overline{D}_j) }{ \\sqrt{n} })^2 + \\langle\overline{∆D}\\rangle^2} $  ")
+axb[2].imshow(SEM_Matrix, vmin=SEM_min, vmax=SEM_max, cmap=plt.cm.Greens,interpolation='lanczos')
+axb[2].set_title("Standard error of the mean (mGy),\n SEM = ${ \\frac{ SD(\overline{D}) }{ \\sqrt{n} } } $  ")
 axb[2].invert_yaxis()
 for i in range(x):
     for j in range(y):
@@ -261,24 +260,23 @@ for i in range(x):
         e = SEM_Matrix[j,i]
         g = np.array([c, d, e])
         for k in range(3):
-            axb[k].text(i, j, '%.2f' %g[k], va='center', ha='center', fontsize=fs)
+            axb[k].text(i, j, '%.1f' %g[k], va='center', ha='center', fontsize=fs)
 plt.tight_layout(rect=titlecorrection)
 plt.savefig("%s_%s_gnsnSEogSEM.pdf"%(SSD,t))
 
-
 #### PLOT FOR AT SE HVOR MEGET ENKELTE MÅLINGER AFVIGER FRA GENNEMSNITTET AF DE RESTERENDE MÅLINGER
-
 # plt.rc('grid', color='w', linestyle='solid')
-titlec = " %s, %ss: m'te måling i hvert punktsæt normaliseret i forhold til gennemsnittet af de resterende målinger i samme sæt"
+titlec = " %s, %ss: Alle i'ende-målinger i samme plot normaliseret i forhold til gennemsnittet af punktsættet"
 ylimits = (0.91, 1.09)
 if m <= 5:
     figc, axc = plt.subplots(nrows=1,ncols=5,figsize=(14, 6), sharey="all")
     figc.suptitle(titlec%(SSD, t), fontsize=FS)
     for i in range(m):
-        avg_wi = np.mean(NormArray_wi[i])
-        sem_wi = np.std(NormArray_wi[i])/np.sqrt(len(NormArray_wi[i]))
-        axc[i].axhline(y=avg_wi,label="gnsn: %.3f±%.3f"%(avg_wi,sem_wi), color="red")
-        axc[i].plot(NormArray_wi[i], ".", label="norm. måling")
+        avg = np.mean(NormArray[i])
+        sem = np.std(NormArray[i])/np.sqrt(len(NormArray[i]))
+        axc[i].axhline(y=avg,label="gnsn: %.3f±%.3f"%(avg,sem), color="red")
+        axc[i].axhline(y=1, linestyle='dotted', color="lightgray")
+        axc[i].plot(NormArray[i], ".", label="norm. måling")
         axc[i].set_title("alle %s.-målinger"%(i+1))
         axc[i].legend(loc=9, fontsize=fs)
         axc[i].set_ylim((ylimits))
@@ -288,10 +286,11 @@ else:
     figc.suptitle(titlec%(SSD, t), fontsize=FS)
     for i in range(2):
         for j in range(5):
-            avg_wi = np.mean(NormArray_wi[j + i*5])
-            sem_wi = np.std(NormArray_wi[j + i*5])/np.sqrt(len(NormArray_wi[i]))
-            axc[i,j].axhline(y=avg_wi,label="gnsn: %.3f±%.3f"%(avg_wi,sem_wi), color="red")
-            axc[i,j].plot(NormArray_wi[j + i*5], ".", label="norm. måling")
+            avg = np.mean(NormArray[j + i*5])
+            sem = np.std(NormArray[j + i*5])/np.sqrt(len(NormArray[i]))
+            axc[i,j].axhline(y=avg,label="gnsn: %.3f±%.3f"%(avg,sem), color="red")
+            axc[i,j].axhline(y=1, linestyle='dotted', color="lightgray")
+            axc[i,j].plot(NormArray[j + i*5], ".", label="norm. måling")
             axc[i,j].set_title("alle %s.-målinger"%(j + 1 + i*5))
             axc[i,j].legend(loc=9, fontsize=fs)
             axc[i,j].set_ylim(ylimits)
@@ -302,16 +301,17 @@ plt.tight_layout(rect=titlecorrection)
 plt.savefig("%s_%s_norm_rest_alle.pdf"%(SSD,t))
 
 
-titled = "%s, %ss: Første måling i hvert punktsæt\n normaliseret i forhold til gennemsnittet\n af de resterende målinger i samme sæt"
+titled = "%s, %ss: Første måling i hvert punktsæt\n normaliseret i forhold til\n gennemsnittet af punktsættet"
 figd, axd = plt.subplots()
-axd.plot(NormArray_wi[0], ".", label="normaliseret måling")
+axd.plot(NormArray[0], ".", label="normaliseret måling")
 axd.set_ylim(ylimits)
 axd.set_xlabel("Målingsindeks")
 axd.set_ylabel("Normaliseret måling")
-avg_wi0 = np.mean(NormArray_wi[0])
-sem_wi0 = np.std(NormArray_wi[0])/np.sqrt(len(NormArray_wi[0]))
+avg0 = np.mean(NormArray[0])
+sem0 = np.std(NormArray[0])/np.sqrt(len(NormArray[0]))
 # axd.fill_between(np.array(len(NormArray_wi[0])),avg_wi0-sem_wi0, avg_wi0+sem_wi0)
-axd.axhline(y=avg_wi0,label="gennemsnit: %.3f±%.3f"%(avg_wi0, sem_wi0), color="red")
+axd.axhline(y=avg0,label="gennemsnit: %.3f±%.3f"%(avg0, sem0), color="red")
+axd.axhline(y=1, linestyle='dotted', color="lightgray")
 axd.set_title(titled%(SSD, t), fontsize=FS)
 axd.legend()
 plt.tight_layout(rect=titlecorrection)
@@ -322,7 +322,6 @@ else:
 
 plt.tight_layout()
 plt.savefig("%s_%s_norm_rest.pdf"%(SSD,t))
-
 
 titlee = "Kalibreringsfaktor $\\delta(t)$ for kort eksponering"
 fige, axe = plt.subplots()
@@ -339,12 +338,12 @@ plt.savefig("Kalib_faktor_over_tid.pdf")
 # for i in range(n*N):
 #     if x[i]==0: #lav mellemrum i udskriften mellem hver kolonne på perspex-pladen
 #         print()
-#     print ("%s. forsøg: I feltet (%s,%s) er CHRG ="%( ( int(f[i] + 1), int(x[i]), int(y[i])  ) ),  "%.2f"%avg[i], '±', "%.2f"%std[i], "nC, og Dosen =", "%.2f"%dosav[i], "±", "%.2f"%dostd[i] , "mGy")
+#     print ("%s. forsøg: I feltet (%s,%s) er CHRG ="%( ( int(f[i] + 1), int(x[i]), int(y[i])  ) ),  "%.1f"%avg[i], '±', "%.1f"%std[i], "nC, og Dosen =", "%.1f"%dosav[i], "±", "%.1f"%dostd[i] , "mGy")
 #### PRINT GENNEMSNITSDOSE OG SEM I HVERT MÅLEPUNKT ####
 # for i in range(N):
 #     if x[i]==0: #lav mellemrum i udskriften mellem hver kolonne på perspex-pladen
 #         print()
-#     print ("I feltet (%s,%s) er dosen i gennemsnit ="  %( int(x[i]), int(y[i]) ),"%.2f"%DOSE_AVG[i], "±","%.2f"%DOSE_SEM[i], "mGy")
+#     print ("I feltet (%s,%s) er dosen i gennemsnit ="  %( int(x[i]), int(y[i]) ),"%.1f"%DOSE_AVG[i], "±","%.1f"%DOSE_SEM[i], "mGy")
 # print()
 print()
 print("D[0] =", D[0])
@@ -360,4 +359,4 @@ print()
 print("antal forsøg kørt: %s " %(n))
 print()
 
-# plt.show()
+plt.show()
