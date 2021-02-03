@@ -8,18 +8,14 @@ røntgenapparatets eksponeringskammer med et dosimeter som fæstes med tape i
 hvert af de 30 midterste punkter.
 Målingerne gives i nC (nanoCoulomb).
 
-Eksponeringstid: 20 sekunder.
-Afstand fra røntgenkilden: 50 cm (SSD50).
-Afstand fra røntgenkilden: 40 cm (SSD40).
-Filtrering: 1.52 mm Al + 2.60 mm Cu.
-Spænding over røntgenrøret: 220 kV (kiloVolt).
-Katodestrøm: 10 mA (milliAmpere).
+Udregner og plotter gennemsnitsdosis, standardafvig, totalgennemsnitsdosis,
+standard error og standard error of the mean.
+Udregner afviget i den i'ende måling i hvert punktmålingssæt.
 
-I hvert punkt tages fem målinger.
-Gennemsnit (mean) for de fem målinger udregnes med numpy.mean().
-Standardafvig (SD) for de fem målinger udregnes med numpy.std()
-Dosen udregnes ved at gange gennemsnittet med en omregningsfaktor som gives af
-fabrikatet af dosimeteret på K = 43.77 mGy/nC (milliGray/nanoCoulomb)
+Standardafvig i procent.
+
+Dosen udregnes ved at gange målingen med en kalibreringsfaktor:
+K = 43.77 ± 0.039 mGy/nC (milliGray/nanoCoulomb)
 
 Forsøget gentages n gange.
 Gennemsnitsdosen findes ved at tage gennemsnittet af gennemsnitsdoserne fra
@@ -27,19 +23,11 @@ hvert forsøg med numpy.mean().
 Dosens standardafvig (SD) findes med numpy.std() og fejlen (SEM = SD/sqrt(n))
 findes med numpy.std()/sqrt(n).
 
-
 Begrænsninger:
 For at numpy.loadtxt() skal kunne læse txt.-filen må der ikke være forskel i
-kolonnernes længde.
+rækkernes længde.
 Det betyder, at forsøget altid skal laves med samme antal målinger i hvert
 punkt,hvis numpy.loadtxt() skal kunne klare at læse filen.
-
-
-Spørgsmål: Hvordan inplementerer jeg fejlen i estimatet for
-kalibreringsfaktoren: (∆D/D)2 = (∆C/C)2 + (∆K/K)2
-
-Alle målinger af CHRG er estimeret til ±0.02
-
 """
 
 import numpy as np
@@ -97,14 +85,16 @@ for i in range(N*n):
         DD[i,j] = np.sqrt( (DC/C[i,j])**2 + (DNK/NK)**2 )*D[i,j]
 
 #### UDREGN GENNEMSNITTET AF MÅLINGERNE I HVERT PUNKT OG OMREGN TIL DOSIS ####
-D_Matrix = np.zeros( (n, y, x) )                # 3 6x5-matricer med hvert enkelt forsøgs dosisgnsn i hver sin matrice
-S_Matrix = np.zeros( (n, y, x) )                # 3 6x5-matricer med hvert enkelt forsøgs SD i hver sin matrice
+D_Matrix = np.zeros((n, y, x))                # 3 6x5-matricer med hvert enkelt forsøgs dosisgnsn i hver sin matrice
+S_Matrix = np.zeros((n, y, x))                # 3 6x5-matricer med hvert enkelt forsøgs SD i hver sin matrice
+P_Matrix = np.zeros((n, y, x))
+
+d_matrix = np.zeros((y, x))                   # 6x5-matrice: dosisgnsn som rækker
+s_matrix = np.zeros((y, x))                   # 6x5-matrice: SD som rækker
+yd = np.zeros(x)                                # 5-array: dosisgnsn for hvert punkt på en y-linje
+ys = np.zeros(x)                                # 5-array: SD for hvert punkt på en y-linje
 for i in range(n):                              # gå igennem alle forsøg
-    d_matrix = np.zeros( (y, x) )                   # 6x5-matrice: dosisgnsn som rækker
-    s_matrix = np.zeros( (y, x) )                   # 6x5-matrice: SD som rækker
     for j in range(y):                          # gå igennem alle rækker
-        yd = np.zeros(x)                                # 5-array: dosisgnsn for hvert punkt på en y-linje
-        ys = np.zeros(x)                                # 5-array: SD for hvert punkt på en y-linje
         for k in range(x):                      # gå igennem alle målepunkter
             yd[k] = np.mean(D[k + j*x + i*N])   # gnsn af hvert punktsæt
             ys[k] = np.std(D[k + j*x + i*N])    # SD af hvert punktsæt
@@ -112,17 +102,19 @@ for i in range(n):                              # gå igennem alle forsøg
         s_matrix[j] = ys                        # 6x5-matrice med SD
     D_Matrix[i] = d_matrix                      # 3 6x5 matricer med gnsn til PLOTTING
     S_Matrix[i] = s_matrix                      # 3 6x5 matricer med SD til PLOTTING
+    P_Matrix[i] = S_Matrix[i]/D_Matrix[i]*100   # SD i procent
+
 
 #### MATRICER MED GENNEMSNITSDOSIS, SE, OG SEM I HVERT PUNKT
 Mean_Of_Total = np.zeros(N)
 Mean_Of_Means = np.zeros(N)
 SE = np.zeros(N)
 SEM = np.zeros(N)
+AllPoints = np.zeros((n, m))                          # for hvert målepunkt; lav en 3-array med hver alle enkeltmålinger D i samme punkt
+AllErrors = np.zeros((n, m))                          # for hvert målepunkt; lav en 3-array med hver alle enkeltfejl ∆D i samme punkt
+PointMeans = np.zeros(n)                                # for hvert målepunkt; lav en 3-array med hver alle gennemsnitsmålinger <D> i samme punkt
+PointErrors = np.zeros(n)                               # for hvert målepunkt; lav en 3-array med hver alle gennemsnitsfejl <∆D> i samme punkt
 for i in range(N):                                          # gå igennem alle målepunkter på perspexpladen: range(N) = 0,1,2,...29
-    AllPoints = np.zeros( (n, m) )                          # for hvert målepunkt; lav en 3-array med hver alle enkeltmålinger D i samme punkt
-    AllErrors = np.zeros( (n, m) )                          # for hvert målepunkt; lav en 3-array med hver alle enkeltfejl ∆D i samme punkt
-    PointMeans = np.zeros(n)                                # for hvert målepunkt; lav en 3-array med hver alle gennemsnitsmålinger <D> i samme punkt
-    PointErrors = np.zeros(n)                               # for hvert målepunkt; lav en 3-array med hver alle gennemsnitsfejl <∆D> i samme punkt
     for j in range(n):                                      # gå igennem alle målinger i hvert punkt: range(n) = 0,1,2
         AllPoints[j] = D[i + N*j]                           # alle enkeltmålinger fra alle forsøg
         AllErrors[j] = DD[i + N*j]                          # alle enkeltmålingers standardfejl fra alle forsøg
@@ -139,10 +131,10 @@ ya = np.zeros(x)
 ym = np.zeros(x)
 yse = np.zeros(x)
 ysem = np.zeros(x)
-DA_Matrix = np.zeros( (y, x) )          # matrice til totalgennemsnit udregnet fra samtlige n*m målinger i hvert punkt
-DM_Matrix = np.zeros( (y, x) )          # matrice til totalgennemsnit udregnet fra n gennemsnit i hvert punkt
-SE_Matrix = np.zeros( (y, x) )          # matrice til SE i hvert punkt
-SEM_Matrix = np.zeros( (y, x) )         # matrice til SEM i hvert punkt
+DA_Matrix = np.zeros((y, x))          # matrice til totalgennemsnit udregnet fra samtlige n*m målinger i hvert punkt
+DM_Matrix = np.zeros((y, x))          # matrice til totalgennemsnit udregnet fra n gennemsnit i hvert punkt
+SE_Matrix = np.zeros((y, x))          # matrice til SE i hvert punkt
+SEM_Matrix = np.zeros((y, x))         # matrice til SEM i hvert punkt
 for i in range(y):                      # gå igennem hver linje på perspexpladen
     for j in range(x):                  # gå igennem hvert punkt på perspexpladen
         ya[j] = Mean_Of_Total[j + i*x]  # fyld 6 5-arrays (én for hver linje på pladen) med gnsn af alle målinger
@@ -163,14 +155,14 @@ if DA_Matrix.any() != DM_Matrix.any():
 #### I DEN FØRSTE MÅLING
 norm = np.zeros_like(D)             # norm
 norm_wi = np.zeros_like(D)          # norm without index i
-NormArray = np.zeros( (m, n*N) )    # NormArray
-NormArray_wi = np.zeros( (m, n*N) ) # NormArray without index i
+NormArray = np.zeros((m, n*N))    # NormArray
+NormArray_wi = np.zeros((m, n*N)) # NormArray without index i
 
 # udregn normaliserede værdier og fyld matricer til PLOTTING
 for i in range(n*N):                                                        # hele datasættet igennem (90 punkter)
     norm[i] = D[i]/np.mean(D[i])                                            # normaliser alle målinger ift eget punktsæt
     for j in range(m):                                                      # 5 eller 10 gange, dvs en gang pr målingsindeks
-        norm_wi[i] = D[i]/np.mean(np.concatenate( (D[i,:j], D[i,j+1:]) ))   # normaliser måling ift resterende målinger (ikke egen måling)
+        norm_wi[i] = D[i]/np.mean(np.concatenate((D[i,:j], D[i,j+1:])))   # normaliser måling ift resterende målinger (ikke egen måling)
         NormArray[j,i] = norm[i,j]                                          # array med til plotting
         NormArray_wi[j,i] = norm_wi[i,j]                                    # array med til plotting
 
@@ -190,6 +182,9 @@ D_min = D_Matrix.min()
 D_max = D_Matrix.max()
 S_min = 1 #S_Matrix.min()
 S_max = 3.3 #S_Matrix.max()
+P_min = 1.5 #S_Matrix.min()
+P_max = 4 #S_Matrix.max()
+
 
 DM_min = D_min
 DM_max = D_max
@@ -209,16 +204,17 @@ if n == 1:
     axa[0].imshow(D_Matrix[0], vmin=D_min, vmax=D_max, cmap='inferno',interpolation='lanczos')#, interpolation='lanczos')
     axa[0].set_title("Dosis: $\\overline{D}$ (mGy)")
     axa[0].invert_yaxis()
-    axa[1].imshow(S_Matrix[0], vmin=S_min, vmax=S_max, cmap=plt.cm.Blues,interpolation='lanczos')#, interpolation='lanczos')
+    axa[1].imshow(P_Matrix[0], vmin=P_min, vmax=P_max, cmap=plt.cm.Blues,interpolation='lanczos')#, interpolation='lanczos')
     axa[1].set_title("Standardafvig (mGy)")
     axa[1].invert_yaxis()
     for i in range(x):
         for j in range(y):
             c = D_Matrix[0,j,i]
             d = S_Matrix[0,j,i]
+            e = P_Matrix[0,j,i]
             axa[0].text(i, j, '%.1f' %c, va='bottom', ha='center', fontsize=fs)
             axa[0].text(i, j, "±"'%.1f' %d, va='top', ha='center', fontsize=fs)
-            axa[1].text(i, j, '%.1f' %d, va='center', ha='center', fontsize=fs)
+            axa[1].text(i, j, '%.1f%s'%(e,"%"), va='center', ha='center', fontsize=fs)
     plt.tight_layout(rect=[0, 0.03, 1, 0.9])
 else:
     figa, axa = plt.subplots(nrows=2,ncols=n,figsize=(12, 8))
@@ -227,16 +223,17 @@ else:
         axa[0,i].imshow(D_Matrix[i], vmin=D_min, vmax=D_max, cmap='inferno',interpolation='lanczos')
         axa[0,i].set_title("Dosis: $\\overline{D}$ (mGy), %s. forsøg"%(int(i+1)))
         axa[0,i].invert_yaxis()
-        axa[1,i].imshow(S_Matrix[i], vmin=S_min, vmax=S_max, cmap=plt.cm.Blues,interpolation='lanczos')
-        axa[1,i].set_title("Standardafvig (mGy)")
+        axa[1,i].imshow(S_Matrix[i], vmin=P_min, vmax=P_max, cmap=plt.cm.Blues,interpolation='lanczos')
+        axa[1,i].set_title("Standardafvig (%)")
         axa[1,i].invert_yaxis()
         for j in range(x):
             for k in range(y):
                 c = D_Matrix[i,k,j]
                 d = S_Matrix[i,k,j]
+                e = P_Matrix[i,k,j]
                 axa[0,i].text(j, k, '%.1f' %c, va='bottom', ha='center', fontsize=fs)
                 axa[0,i].text(j, k, "±"'%.1f' %d, va='top', ha='center', fontsize=fs)
-                axa[1,i].text(j, k, '%.1f' %d, va='center', ha='center', fontsize=fs)
+                axa[1,i].text(j, k, '%.1f%s'%(e,"%"), va='center', ha='center', fontsize=fs)
     plt.tight_layout(rect=titlecorrection)
 plt.savefig("%s_%s_dosiogSD.pdf"%(SSD,t))
 
