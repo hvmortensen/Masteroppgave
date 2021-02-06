@@ -135,6 +135,8 @@ DA_Matrix = np.zeros((y, x))          # matrice til totalgennemsnit udregnet fra
 DM_Matrix = np.zeros((y, x))          # matrice til totalgennemsnit udregnet fra n gennemsnit i hvert punkt
 SE_Matrix = np.zeros((y, x))          # matrice til SE i hvert punkt
 SEM_Matrix = np.zeros((y, x))         # matrice til SEM i hvert punkt
+PSE_Matrix = np.zeros((y, x))
+PSEM_Matrix = np.zeros((y, x))
 for i in range(y):                      # gå igennem hver linje på perspexpladen
     for j in range(x):                  # gå igennem hvert punkt på perspexpladen
         ya[j] = Mean_Of_Total[j + i*x]  # fyld 6 5-arrays (én for hver linje på pladen) med gnsn af alle målinger
@@ -145,6 +147,8 @@ for i in range(y):                      # gå igennem hver linje på perspexplad
     DM_Matrix[i] = ym                   # fyld 6x5-dosematrix til plotting
     SE_Matrix[i] = yse                  # fyld 6x5-SE-matrix til plotting
     SEM_Matrix[i] = ysem                # fyld 6x5-SEM-matrix til plotting
+    PSE_Matrix[i] = SE_Matrix[i]/DA_Matrix[i]*100
+    PSEM_Matrix[i] = SEM_Matrix[i]/DM_Matrix[i]*100
 
 #### Sikkerhed for at SE og SEM er rigtig udregnet ####
 if DA_Matrix.any() != DM_Matrix.any():
@@ -182,7 +186,7 @@ D_min = D_Matrix.min()
 D_max = D_Matrix.max()
 S_min = 1 #S_Matrix.min()
 S_max = 3.3 #S_Matrix.max()
-P_min = 1.5 #S_Matrix.min()
+P_min = 1 #S_Matrix.min()
 P_max = 4 #S_Matrix.max()
 
 
@@ -242,22 +246,25 @@ titleb = "%s, %ss: %s forsøg, %s målinger pr punkt "
 figb, axb = plt.subplots(nrows=1,ncols=3,figsize=(9.55, 5))
 figb.suptitle(titleb%(SSD, t,n, m), fontsize=FS)
 axb[0].imshow(DM_Matrix, vmin=DM_min, vmax=DM_max, cmap='inferno',interpolation='lanczos')
-axb[0].set_title("Dosis: $\\langle D\\rangle$ (mGy)")
+axb[0].set_title("Dosis: $\\langle D\\rangle$ ± SEM (mGy)")
 axb[0].invert_yaxis()
-axb[1].imshow(SE_Matrix, vmin=SE_min, vmax=SE_max, cmap=plt.cm.Blues,interpolation='lanczos')
-axb[1].set_title("Standard error (mGy),\n SE = ${ \\frac{ SD(D) }{ \\sqrt{n\\cdot m} }} $  ")
+axb[1].imshow(PSEM_Matrix, vmin=P_min, vmax=P_max, cmap=plt.cm.Greens,interpolation='lanczos')
+axb[1].set_title("Standard error of the mean (%),\n SEM = ${ \\frac{ SD(\overline{D}) }{ \\sqrt{n} } } $  ")
 axb[1].invert_yaxis()
-axb[2].imshow(SEM_Matrix, vmin=SEM_min, vmax=SEM_max, cmap=plt.cm.Greens,interpolation='lanczos')
-axb[2].set_title("Standard error of the mean (mGy),\n SEM = ${ \\frac{ SD(\overline{D}) }{ \\sqrt{n} } } $  ")
+axb[2].imshow(PSE_Matrix, vmin=P_min, vmax=P_max, cmap=plt.cm.Blues,interpolation='lanczos')
+axb[2].set_title("Standard error (%),\n SE = ${ \\frac{ SD(D) }{ \\sqrt{n\\cdot m} }} $  ")
 axb[2].invert_yaxis()
 for i in range(x):
     for j in range(y):
+        b = SEM_Matrix[j,i]
         c = DM_Matrix[j,i]
-        d = SE_Matrix[j,i]
-        e = SEM_Matrix[j,i]
-        g = np.array([c, d, e])
-        for k in range(3):
-            axb[k].text(i, j, '%.1f' %g[k], va='center', ha='center', fontsize=fs)
+        axb[0].text(i, j, '%.1f' %c, va='bottom', ha='center', fontsize=fs)
+        axb[0].text(i, j, '±%.1f' %b, va='top', ha='center', fontsize=fs)
+        d = PSEM_Matrix[j,i]
+        e = PSE_Matrix[j,i]
+        g = np.array([d, e])
+        for k in range(2):
+            axb[k+1].text(i, j, '%.1f%s' %(g[k],"%"), va='center', ha='center', fontsize=fs)
 plt.tight_layout(rect=titlecorrection)
 plt.savefig("%s_%s_gnsnSEogSEM.pdf"%(SSD,t))
 
