@@ -10,6 +10,13 @@ kTP = 1.018
 NK = 43.77
 K = NK*ku*muen_over_rho*pu*kTP
 
+def CHRG(d):
+    return d/K
+
+print (CHRG(1000))
+
+
+
 
 # ## Målinger for t sekunder
 # ## Plexiboxen blev skubbet lidt rundt for at finde det bedste sted:

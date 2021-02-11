@@ -16,6 +16,9 @@ plt.rc('patch', edgecolor='#E6E6E6')
 plt.rc('lines', linewidth=2)
 
 
+FS = 14 # fontsixe til superoverskrift
+fs = FS - 2  # fontsize til lengend()
+FFS = FS + 3
 fig, axq = plt.subplots()
 
 xx = 5
@@ -107,6 +110,8 @@ plt.axvline(x=x, ymin=0, ymax=0.28, color='midnightblue')
 grid = np.zeros( (yy,xx) )
 axq.imshow(grid, cmap=plt.cm.Blues, vmin=grid.min(), vmax=grid.max())
 axq.invert_yaxis()
+axq.tick_params(axis='both', which='major', labelsize=fs)
+axq.set_xticks([0,1,2,3,4])
 plt.tight_layout()
 plt.draw()
 plt.savefig("gitter.pdf")
