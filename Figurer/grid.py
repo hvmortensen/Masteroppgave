@@ -24,10 +24,10 @@ fig, axq = plt.subplots()
 xx = 5
 yy = 6
 #
-# d = mpimg.imread('rect10.png')
+# d = mpimg.imread('gitter.png')
 # imagebox = OffsetImage(d, zoom=0.2)
 # ab = AnnotationBbox(imagebox, (2, 3))
-# ax.add_artist(ab)
+# axq.add_artist(ab)
 
 x = 1
 y = 2
@@ -108,11 +108,14 @@ plt.axvline(x=x, ymin=0, ymax=0.28, color='midnightblue')
 
 # gitteret på perspexpladen
 grid = np.zeros( (yy,xx) )
-axq.imshow(grid, cmap=plt.cm.Blues, vmin=grid.min(), vmax=grid.max())
+# grid[2:-1,1:-1] = 1
+
+axq.imshow(grid, cmap=plt.cm.Blues, vmin=grid.min(), vmax=2,interpolation='none')
 axq.invert_yaxis()
 axq.tick_params(axis='both', which='major', labelsize=fs)
-axq.set_xticks([0,1,2,3,4])
+# axq.set_xticks([])
+# axq.set_yticks([])
 plt.tight_layout()
-plt.draw()
-plt.savefig("gitter.pdf")
+# plt.draw()
+plt.savefig("gitter.png")
 plt.show()

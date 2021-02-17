@@ -28,24 +28,29 @@ def line_r(x):
 def line_s(x):
     return np.exp(-a_s*x)
 
-plt.rcParams.update({'font.size': 13})
+FS = 14 # fontsixe til superoverskrift
+fs = FS - 2  # fontsize til lengend()
+FFS = FS + 1
+
+# plt.rcParams.update({'font.size': 12})
 ax = plt.subplot(1, 1, 1)
 plt.semilogy(D,S(D), linewidth=2, label="Overlevelsesfraktion")
 plt.semilogy(D,Sn(D), "r-.", linewidth=2, label="LQ-model")
-plt.semilogy(xr,line_r(xr),"--", label="$\\alpha_r = %s$"%a_r)
-plt.semilogy(xs,line_s(xs),"--", label="$\\alpha_s = %s$"%a_s)
+plt.semilogy(xr,line_r(xr),"--", label="$\\alpha_r$")
+plt.semilogy(xs,line_s(xs),"--", label="$\\alpha_s$")
 # plt.semilogy(Dc, np.exp(-a*Dc - b*Dc**2))
 # plt.semilogy(Dc,"o")
-plt.plot(Dc, S(Dc), "ko", label="$D_c = %s$"%Dc)
+plt.plot(Dc, S(Dc), "ko", label="$D_c$")
 ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%.1f'))
-ax.axis([0, 2, 0.45, 1.1])
-plt.yticks( [1.1, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5] )
-plt.xticks( [0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0] )
+ax.axis([0, 2, 0.45, 1.09])
+ax.tick_params(axis='both', which='major', labelsize=fs)
+plt.yticks( [ 1.0, 0.9, 0.8, 0.7, 0.6, 0.5] )
+plt.xticks( [0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0] )
 ax.xaxis.set_major_formatter(plt.FormatStrFormatter('%.1f'))
 # # xticks(size=f)
-plt.ylabel('Overlevelsesfraktion')
-plt.xlabel('Dose (Gy)')
-plt.legend()
+plt.ylabel('Overlevelsesfraktion',fontsize=fs)
+plt.xlabel('Dose (Gy)',fontsize=fs)
+plt.legend(fontsize=fs)
 # minorticks_on()
 
 # locmin = LogLocator(subs=(0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.61,
@@ -56,6 +61,6 @@ plt.legend()
 # ax.yaxis.set_minor_locator(locmin)
 # ax.yaxis.set_minor_formatter(NullFormatter())
 
-plt.savefig("Survivalcurve.pdf")
 plt.tight_layout()
+plt.savefig("Survivalcurve.pdf")
 plt.show()
