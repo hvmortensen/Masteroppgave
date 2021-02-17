@@ -33,6 +33,8 @@ punkt,hvis numpy.loadtxt() skal kunne klare at læse filen.
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cycler
+from matplotlib.offsetbox import TextArea, DrawingArea, OffsetImage, AnnotationBbox, AnchoredOffsetbox
+import matplotlib.image as mpimg
 # colors = cycler('color',
 #                 ['#EE6666', '#3388BB', '#9988DD',
 #                  '#EECC55', '#88BB44', '#FFBBBB'])
@@ -59,9 +61,9 @@ DC = 0.02
 
 #### VÆLG TXT.-FIL SOM SKAL KØRES ####
 filename = 'xray_data_SSD50_20s.txt'; t = 20; SSD = "SSD50"
-filename = 'xray_data_SSD40_14s.txt'; t = 14; SSD = "SSD40"
-filename = 'xray_data_SSD40_13s.txt'; t = 13; SSD = "SSD40"
-# filename = 'xray_data_SSD37_5_12s.txt'; t = 12; SSD = "SSD37_5"
+# filename = 'xray_data_SSD40_14s.txt'; t = 14; SSD = "SSD40"
+# filename = 'xray_data_SSD40_13s.txt'; t = 13; SSD = "SSD40"
+filename = 'xray_data_SSD37_5_12s.txt'; t = 12; SSD = "SSD37_5"
 
 # sortér data i kolonner
 data = np.loadtxt(filename)
@@ -89,8 +91,6 @@ D_Matrix = np.zeros((n, y, x))                # 3 6x5-matricer med hvert enkelt 
 S_Matrix = np.zeros((n, y, x))                # 3 6x5-matricer med hvert enkelt forsøgs SD i hver sin matrice
 P_Matrix = np.zeros((n, y, x))
 
-pmean = np.zeros(n)
-
 d_matrix = np.zeros((y, x))                   # 6x5-matrice: dosisgnsn som rækker
 s_matrix = np.zeros((y, x))                   # 6x5-matrice: SD som rækker
 yd = np.zeros(x)                                # 5-array: dosisgnsn for hvert punkt på en y-linje
@@ -105,9 +105,17 @@ for i in range(n):                              # gå igennem alle forsøg
     D_Matrix[i] = d_matrix                      # 3 6x5 matricer med gnsn til PLOTTING
     S_Matrix[i] = s_matrix                      # 3 6x5 matricer med SD til PLOTTING
     P_Matrix[i] = S_Matrix[i]/D_Matrix[i]*100   # SD i procent
-    pmean[i] = np.mean(P_Matrix[i])
 
-
+#
+# p_hom = np.zeros((y-2, x-2))
+# y_hom = np.zeros(x-2)
+# for i in range(n):
+#     for j in range(y - 2):
+#         for k in range(x - 2):
+#             y_hom[k] = np.mean(D[k + j*x + i*N])   # gnsn af hvert punktsæt
+#         p_hom[i] = y_hom
+#     P_Hom[i] = p_hom
+# print(P_Hom)
 
 #### MATRICER MED GENNEMSNITSDOSIS, SE, OG SEM I HVERT PUNKT
 Mean_Of_Total = np.zeros(N)
@@ -154,6 +162,7 @@ for i in range(y):                      # gå igennem hver linje på perspexplad
     PSE_Matrix[i] = SE_Matrix[i]/DA_Matrix[i]*100
     PSEM_Matrix[i] = SEM_Matrix[i]/DM_Matrix[i]*100
 
+
 #### Sikkerhed for at SE og SEM er rigtig udregnet ####
 if DA_Matrix.any() != DM_Matrix.any():
     print('ADVARSEL!! Gennemssnitsdose udregnet fra alle målinger ≠ gennemsnitsdose udregnet fra gennemsnittene')
@@ -163,41 +172,62 @@ if DA_Matrix.any() != DM_Matrix.any():
 #### I DEN FØRSTE MÅLING
 norm = np.zeros_like(D)             # norm
 norm_wi = np.zeros_like(D)          # norm without index i
+norm_wi0 = np.zeros_like(D)          # norm without index i
 NormArray = np.zeros((m, n*N))    # NormArray
 NormArray_wi = np.zeros((m, n*N)) # NormArray without index i
+NormArray_wi0 = np.zeros((m, n*N)) # NormArray without index 0
+
 
 # udregn normaliserede værdier og fyld matricer til PLOTTING
 for i in range(n*N):                                                        # hele datasættet igennem (90 punkter)
     norm[i] = D[i]/np.mean(D[i])                                            # normaliser alle målinger ift eget punktsæt
+    norm_wi0[i] = D[i]/np.mean(D[i,1:])
     for j in range(m):                                                      # 5 eller 10 gange, dvs en gang pr målingsindeks
         norm_wi[i] = D[i]/np.mean(np.concatenate((D[i,:j], D[i,j+1:])))   # normaliser måling ift resterende målinger (ikke egen måling)
         NormArray[j,i] = norm[i,j]                                          # array med til plotting
         NormArray_wi[j,i] = norm_wi[i,j]                                    # array med til plotting
+        NormArray_wi0[j,i] = norm_wi0[i,j]
 
-avg0 = np.mean(NormArray[0])
-sem0 = np.std(NormArray[0])/np.sqrt(len(NormArray[0]))
-
-avg0_wi = np.mean(NormArray_wi[0])
-sem0_wi = np.std(NormArray_wi[0])/np.sqrt(len(NormArray_wi[0]))
 
 #### LILLE PLOT MED KALIBRERINGSFAKTOR FOR FORSKELLIGE EKSPONERINGSTIDER ####
-# print(avg0)
-# print(sem0)
-first_meas_norms = np.array([1.0215465117895153, 1.0204540638976112, 1.0120538668226677, 1.0087396484416213 ])
-first_meas_sems = np.array([0.006453383607902055, 0.0029130112868874284, 0.002804236240881732, 0.0017078469199871408 ])
 scope = np.array([12, 13, 14, 20])
 
-print(avg0_wi)
-print(sem0_wi)
-first_meas_norms_wi = np.array([1.0241531756700784, 1.0228734481098294, 1.0153356249882308, 1.0110310657488206])
-first_meas_sems_wi = np.array([0.007195479194212357,0.003251859617522467, 0.0035199166727701535, 0.0021444624406433783])
+avg0 = np.mean(NormArray[0])
+std0 = np.std(NormArray[0])
+sem0 = np.std(NormArray[0])/np.sqrt(len(NormArray[0]))
+# print(avg0)
+# print(std0)
+# print(sem0)
+first_meas_norms = np.array([1.0215465117895153, 1.0204540638976112, 1.0120538668226677, 1.0087396484416213 ])
+first_meas_stds = np.array([0.0353466377428203, 0.02763525154902737, 0.026603320855124565,0.016202058486188126])
+first_meas_sems = np.array([0.006453383607902055, 0.0029130112868874284, 0.002804236240881732, 0.0017078469199871408 ])
 
 
-# print(np.mean(pmean))
-# print(np.std(pmean))
-meanstd = np.array([3.1033846687630944, 2.965297682688964, 2.470127000470167, 1.5686170278648195])
-stdstd = np.array([0.0, 0.17421292736587773, 0.05421070458958175, 0.05121055004357074])
+#### KALIBREINGSFAKTOR MED RENSEDE NORMALISERINGER SÅ FØRSTEINDEKSEN IKEN MEDGÅR I GENNEMSNITTET ####
+avg0_wi0 = np.mean(NormArray_wi0[0])
+std0_wi0 = np.std(NormArray_wi0[0])
+sem0_wi0 = np.std(NormArray_wi0[0])/np.sqrt(len(NormArray_wi0[0]))
+# print(avg0_wi0)
+# print(std0_wi0)
+# print(sem0_wi0)
+first_meas_norms_wi0 = np.array([1.0241531756700784, 1.0228734481098294, 1.0153356249882308, 1.0110310657488206])
+first_meas_stds_wi0 = np.array([0.039411262667292044, 0.030849849067484964, 0.033392861579865804, 0.020344157007350143])
+first_meas_sems_wi0 = np.array([0.007195479194212357,0.003251859617522467, 0.0035199166727701535, 0.0021444624406433783])
 
+
+
+#### GENNEMSNITLIG STANDARDAFVIG I DET HOMOGENE OMRÅDE AF EKSPONERINGSREGIONEN ####
+P_Hom_mean = np.mean(P_Matrix[:,2:-1,1:-1])
+P_Hom_std = np.std(P_Matrix[:,2:-1,1:-1])
+P_Hom_sem = np.std(P_Matrix[:,2:-1,1:-1])/np.sqrt(P_Matrix[:,2:-1,1:-1].shape[0]*P_Matrix[:,2:-1,1:-1].shape[1])
+# print((P_Matrix[:,2:-1,1:-1]))
+# print( P_Matrix[:,2:-1,1:-1].shape[0]*P_Matrix[:,2:-1,1:-1].shape[1])
+print(P_Hom_mean)
+print(P_Hom_std)
+print(P_Hom_sem)
+meanstd_hom = np.array([3.0609518709544905, 2.9058740060196473, 2.5327468220836034, 1.6194550102161929])
+stdstd_hom = np.array([0.508958148510818, 0.618839073735935, 0.6038044325544453, 0.5369453932178103])
+semstd_hom = np.array([0.29384712404897434, 0.20627969124531167, 0.2012681441848151, 0.17898179773927012])
 #### PLOTTING ####
 #### PLOTTING ####
 #### PLOTTING ####
@@ -223,12 +253,16 @@ SEM_max = S_max # SEM_Matrix.max()
 
 FS = 14 # fontsixe til superoverskrift
 fs = FS - 2  # fontsize til lengend()
-FFS = FS + 3
+FFS = FS + 1
 titlecorrection = [0, 0.03, 1, 0.95]
 ylimits = (0.91, 1.09)
+
+
+
+
 titlea = "%s, %ss: %s målinger pr punkt"
 if n == 1:
-    figa, axa = plt.subplots(1,2,figsize=(7,4.5))
+    figa, axa = plt.subplots(1,2,figsize=(6.32,4.4))
     # figa.suptitle(titlea%(SSD, t, m), fontsize=FS)
     axa[0].imshow(D_Matrix[0], vmin=D_min, vmax=D_max, cmap='inferno',interpolation='lanczos')#, interpolation='lanczos')
     axa[0].set_title("Dosis: $\\overline{D}$ (mGy)",fontsize=FS)
@@ -248,7 +282,8 @@ if n == 1:
             axa[0].text(i, j, '%.1f' %c, va='bottom', ha='center', fontsize=fs)
             axa[0].text(i, j, "±"'%.1f' %d, va='top', ha='center', fontsize=fs)
             axa[1].text(i, j, '%.1f%s'%(e,"%"), va='center', ha='center', fontsize=fs)
-    plt.tight_layout(rect=[0, 0.03, 1, 0.9])
+    plt.tight_layout()
+    # plt.tight_layout(rect=[0, 0.03, 1, 0.9])
 else:
     figa, axa = plt.subplots(nrows=2,ncols=n,figsize=(12, 8))
     # figa.suptitle(titlea%(SSD, t, m), fontsize=FS)
@@ -271,12 +306,13 @@ else:
                 axa[0,i].text(j, k, '%.1f' %c, va='bottom', ha='center', fontsize=fs)
                 axa[0,i].text(j, k, "±"'%.1f' %d, va='top', ha='center', fontsize=fs)
                 axa[1,i].text(j, k, '%.1f%s'%(e,"%"), va='center', ha='center', fontsize=fs)
-    plt.tight_layout(rect=titlecorrection)
+    plt.tight_layout()
+    # plt.tight_layout(rect=titlecorrection)
 plt.savefig("%s_%s_dosiogSD.pdf"%(SSD,t))
 
 #plot gennemsnitsdose og SEM fra alle forsøg
 titleb = "%s, %ss: %s forsøg, %s målinger pr punkt "
-figb, axb = plt.subplots(nrows=1,ncols=3,figsize=(9.55, 5))
+figb, axb = plt.subplots(nrows=1,ncols=3,figsize=(10.2, 4.4))
 # figb.suptitle(titleb%(SSD, t,n, m), fontsize=FS)
 axb[0].imshow(DM_Matrix, vmin=DM_min, vmax=DM_max, cmap='inferno',interpolation='lanczos')
 axb[0].set_title("Dosis: $\\langle D\\rangle$ ± SEM (mGy)",fontsize=FS)
@@ -304,15 +340,15 @@ for i in range(x):
         g = np.array([d, e])
         for k in range(2):
             axb[k+1].text(i, j, '%.1f%s' %(g[k],"%"), va='center', ha='center', fontsize=fs)
-plt.tight_layout(rect=titlecorrection)
+plt.tight_layout()
+# plt.tight_layout(rect=titlecorrection)
 plt.savefig("%s_%s_gnsnSEogSEM.pdf"%(SSD,t))
 
 
 
 
 
-
-#### PLOT FOR AT SE HVOR MEGET ENKELTE MÅLINGER AFVIGER FRA GENNEMSNITTET AF DE RESTERENDE MÅLINGER
+#### PLOT FOR AT SE HVOR MEGET ENKELTE MÅLINGER AFVIGER FRA GENNEMSNITTET MÅLINGER I SAMME KOHORT
 # plt.rc('grid', color='w', linestyle='solid')
 titlec = " %s, %ss: Alle i'ende-målinger i samme plot normaliseret i forhold til gennemsnittet af punktsættet"
 if m <= 5:
@@ -324,13 +360,20 @@ if m <= 5:
         axc[i].axhline(y=avg,label="gn: %.3f±%.3f"%(avg,sem), color="red")
         axc[i].axhline(y=1, linestyle='dotted', color="lightgray")
         axc[i].plot(NormArray[i], ".", label="norm. måling")
-        axc[i].set_title("alle %s.-målinger"%(i+1),fontsize=fs)
+        axc[i].set_title("alle %s.-målinger"%(i+1),fontsize=FFS)
         axc[i].legend(loc=9, fontsize=fs)
         axc[i].set_ylim((ylimits))
-        axc[i].set_xlabel("Målingsindeks",fontsize=fs)
-        axc[0].set_ylabel("Normaliseret måling og gennemsnit",fontsize=fs)
-        axc[i].set_xticks(np.linspace(0,int(n*N),10))
-        axc[i].tick_params(axis='both', which='major', labelsize=fs)
+        axc[i].set_xlabel("Målingsindeks",fontsize=FFS)
+        axc[0].set_ylabel("Normaliseret måling og gennemsnit",fontsize=FFS)
+        axc[i].tick_params(axis='both', which='major', labelsize=FFS)
+        a=axc[i].get_xticks().tolist()
+        if n == 1:
+            axc[i].set_xticks(np.array([0,10, 20, 29]))
+            a = [1,11,21,30]
+        else:
+            axc[i].set_xticks(np.array([0,30,60,89]))  #np.linspace(0,int(n*N-1),2))
+            a = [1,31,61,90]
+        axc[i].set_xticklabels(a)
 else:
     figc, axc = plt.subplots(nrows=2,ncols=5,figsize=(14, 8), sharey="all")
     # figc.suptitle(titlec%(SSD, t), fontsize=FS)
@@ -341,14 +384,22 @@ else:
             axc[i,j].axhline(y=avg,label="gn: %.3f±%.3f"%(avg,sem), color="red")
             axc[i,j].axhline(y=1, linestyle='dotted', color="lightgray")
             axc[i,j].plot(NormArray[j + i*5], ".", label="norm. måling")
-            axc[i,j].set_title("alle %s.-målinger"%(j + 1 + i*5),fontsize=fs)
+            axc[i,j].set_title("alle %s.-målinger"%(j + 1 + i*5),fontsize=FFS)
             axc[i,j].legend(loc=9, fontsize=fs)
             axc[i,j].set_ylim(ylimits)
-            axc[i,j].set_xlabel("Målingsindeks",fontsize=fs)
-            axc[i,0].set_ylabel("Normaliseret måling og gnsn",fontsize=fs)
-            axc[i,j].set_xticks(np.linspace(0,int(n*N),7))
-            axc[i,j].tick_params(axis='both', which='major', labelsize=fs)
-plt.tight_layout(rect=titlecorrection)
+            axc[i,j].set_xlabel("Målingsindeks",fontsize=FFS)
+            axc[i,0].set_ylabel("Normaliseret måling og gnsn",fontsize=FFS)
+            axc[i,j].tick_params(axis='both', which='major', labelsize=FFS)
+            a=axc[i,j].get_xticks().tolist()
+            if n == 1:
+                axc[i,j].set_xticks(np.array([0,10, 20, 29]))
+                a = [1,11,21,30]
+            else:
+                axc[i,j].set_xticks(np.array([0,30,60,89]))  #np.linspace(0,int(n*N-1),2))
+                a = [1,31,61,90]
+            axc[i,j].set_xticklabels(a)
+plt.tight_layout()
+# plt.tight_layout(rect=titlecorrection)
 plt.savefig("%s_%s_norm_rest_alle.pdf"%(SSD,t))
 
 
@@ -367,58 +418,110 @@ sem0 = np.std(NormArray[0])/np.sqrt(len(NormArray[0]))
 axd.axhline(y=avg0,label="gennemsnit: %.3f±%.3f"%(avg0, sem0), color="red")
 axd.axhline(y=1, linestyle='dotted', color="lightgray")
 axd.legend(fontsize = fs)
-plt.tight_layout(rect=titlecorrection)
+axd.tick_params(axis='both', which='major', labelsize=fs)
+
+a=axd.get_xticks().tolist()
 if n == 1:
-    plt.xticks(np.linspace(0,int(n*N),7),fontsize = fs)
+    axd.set_xticks(np.array([0,10, 20, 29]))
+    a = [1,11,21,30]
 else:
-    plt.xticks(np.linspace(0,int(n*N),19),fontsize = fs)
+    axd.set_xticks(np.array([0,30,60,89]))  #np.linspace(0,int(n*N-1),2))
+    a = [1,31,61,90]
+axd.set_xticklabels(a)
 plt.yticks(fontsize = fs)
 plt.tight_layout()
+# plt.tight_layout(rect=titlecorrection)
 plt.savefig("%s_%s_norm_rest.pdf"%(SSD,t))
+
+
+
+
 
 titlee = "Kalibreringsfaktor $\\delta(t)$ for kort eksponering"
 fige, axe = plt.subplots()
 # axe.set_title(titlee, fontsize=FS)
 axe.plot(scope,first_meas_norms, "r", label="$\\delta(t)$")
-axe.fill_between(scope, first_meas_norms-first_meas_sems, first_meas_norms+first_meas_sems,alpha=0.3,label="SEM")
+axe.fill_between(scope, first_meas_norms-first_meas_sems, first_meas_norms+first_meas_sems, alpha=0.3,label="SEM")
 axe.set_xlabel("Eksponeringstid (s)",fontsize=fs)
 axe.set_ylabel("Kalibreringsfaktor $\\delta(t)$",fontsize=fs)
 axe.legend(fontsize = fs)
+# axe.set_yticks([1.006, 1.008, 1.010, 1.012, 1.014, 1.016, 1.018, 1.020, 1.022, 1.024, 1.026, 1.028])
 plt.xticks(fontsize=fs)
 plt.yticks(fontsize=fs)
-plt.tight_layout(rect=titlecorrection)
+plt.tight_layout()
+# plt.tight_layout(rect=titlecorrection)
 plt.savefig("Kalib_faktor_over_tid.pdf")
 
-titleg = "Kalibreringsfaktor $\\delta(t)$ for kort eksponering (renset)"
+# titlef = "Gennemsnitligt standardafvig i det homogene felt som funktion af eksponeringstid"
+figf, axf = plt.subplots()
+# axe.set_title(titlee, fontsize=FS)
+im = mpimg.imread('gitter.png')
+axf.imshow(im, extent=[11.5,14.35,1.5,2.26], aspect='auto')
+axf.plot(scope,meanstd_hom, label="$\\langle$SD$(t)\\rangle$")
+axf.fill_between(scope, meanstd_hom - semstd_hom, meanstd_hom + semstd_hom,alpha=0.3,label="SEM")
+axf.set_xlabel("Eksponeringstid (s)",fontsize=fs)
+axf.set_ylabel("Gnsn standardafvig $\\langle$SD$(t)\\rangle$ (%)",fontsize=fs)
+axf.legend(fontsize = fs)
+plt.xticks(fontsize=fs)
+plt.yticks(fontsize=fs)
+plt.tight_layout()
+# plt.tight_layout(rect=titlecorrection)
+plt.savefig("Gnsn_std_afvig.pdf")
+#
+titleg = "Kalibreringsfaktor $\\delta(t)$ for kort eksponering uden førstemåling"
 figg, axg = plt.subplots()
-# axg.set_title(titleg, fontsize=FS)
-axg.plot(scope,first_meas_norms_wi, "r", label="$\\delta(t)$")
-axg.fill_between(scope, first_meas_norms_wi-first_meas_sems_wi, first_meas_norms_wi+first_meas_sems_wi,alpha=0.3,label="SEM")
+# axg.set_title(titlee, fontsize=FS)
+axg.plot(scope,first_meas_norms_wi0, "g", label="$\\delta(t)$ (uden indeks 1)")
+axg.fill_between(scope, first_meas_norms_wi0-first_meas_sems_wi0, first_meas_norms_wi0+first_meas_sems_wi0,alpha=0.3,label="SEM")
+axg.plot(scope,first_meas_norms, "r--", label="$\\delta(t)$")
+axg.fill_between(scope, first_meas_norms-first_meas_sems, first_meas_norms+first_meas_sems,alpha=0.3,label="SEM")
 axg.set_xlabel("Eksponeringstid (s)",fontsize=fs)
 axg.set_ylabel("Kalibreringsfaktor $\\delta(t)$",fontsize=fs)
 axg.legend(fontsize = fs)
+# axg.set_yticks([1.006, 1.008, 1.010, 1.012, 1.014, 1.016, 1.018, 1.020, 1.022, 1.024, 1.026, 1.028])
 plt.xticks(fontsize=fs)
 plt.yticks(fontsize=fs)
-plt.tight_layout(rect=titlecorrection)
+plt.tight_layout()
+# plt.tight_layout(rect=titlecorrection)
 plt.savefig("Kalib_faktor_over_tid_renset.pdf")
 
 
 
 
-titlef = "Gennemsnitlig standardafvig i % for kort eksponering"
-figf, axf = plt.subplots()
-# axf.set_title(titlef, fontsize=FS)
-axf.plot(scope,meanstd, "r", label="$\\langle$SD$\\rangle $")
-axf.fill_between(scope, meanstd-stdstd, meanstd+stdstd,alpha=0.3,label="SD($\\langle$SD$\\rangle $)")
-axf.set_xlabel("Eksponeringstid (s)", fontsize=fs)
-axf.set_ylabel("SD (%)", fontsize=fs)
-axf.legend(fontsize = fs)
-plt.xticks(fontsize=fs)
-plt.yticks(fontsize=fs)
-plt.tight_layout(rect=titlecorrection)
-plt.savefig("Standardafvigiprocent.pdf")
 
-plt.show()
+
+
+#
+# titleg = "Kalibreringsfaktor $\\delta(t)$ for kort eksponering (renset)"
+# figg, axg = plt.subplots()
+# # axg.set_title(titleg, fontsize=FS)
+# axg.plot(scope,first_meas_norms_wi, "r", label="$\\delta(t)$")
+# axg.fill_between(scope, first_meas_norms_wi-first_meas_sems_wi, first_meas_norms_wi+first_meas_sems_wi,alpha=0.3,label="SEM")
+# axg.set_xlabel("Eksponeringstid (s)",fontsize=fs)
+# axg.set_ylabel("Kalibreringsfaktor $\\delta(t)$",fontsize=fs)
+# axg.legend(fontsize = fs)
+# plt.xticks(fontsize=fs)
+# plt.yticks(fontsize=fs)
+# plt.tight_layout(rect=titlecorrection)
+# plt.savefig("Kalib_faktor_over_tid_renset.pdf")
+#
+
+
+
+# titlef = "Gennemsnitlig standardafvig i % for kort eksponering"
+# figf, axf = plt.subplots()
+# # axf.set_title(titlef, fontsize=FS)
+# axf.plot(scope,meanstd, "r", label="$\\langle$SD$\\rangle $")
+# axf.fill_between(scope, meanstd-stdstd, meanstd+stdstd,alpha=0.3,label="SD($\\langle$SD$\\rangle $)")
+# axf.set_xlabel("Eksponeringstid (s)", fontsize=fs)
+# axf.set_ylabel("SD (%)", fontsize=fs)
+# axf.legend(fontsize = fs)
+# plt.xticks(fontsize=fs)
+# plt.yticks(fontsize=fs)
+# plt.tight_layout(rect=titlecorrection)
+# plt.savefig("Standardafvigiprocent.pdf")
+
+# plt.show()
 
 
 
@@ -447,4 +550,4 @@ plt.show()
 # print("antal forsøg kørt: %s " %(n))
 # print()
 
-# plt.show()
+plt.show()
