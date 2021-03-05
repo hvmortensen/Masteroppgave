@@ -63,7 +63,7 @@ DC = 0.02
 filename = 'xray_data_SSD50_20s.txt'; t = 20; SSD = "SSD50"
 # filename = 'xray_data_SSD40_14s.txt'; t = 14; SSD = "SSD40"
 # filename = 'xray_data_SSD40_13s.txt'; t = 13; SSD = "SSD40"
-filename = 'xray_data_SSD37_5_12s.txt'; t = 12; SSD = "SSD37_5"
+# filename = 'xray_data_SSD37_5_12s.txt'; t = 12; SSD = "SSD37_5"
 
 # sortér data i kolonner
 data = np.loadtxt(filename)
@@ -222,15 +222,27 @@ P_Hom_std = np.std(P_Matrix[:,2:-1,1:-1])
 P_Hom_sem = np.std(P_Matrix[:,2:-1,1:-1])/np.sqrt(P_Matrix[:,2:-1,1:-1].shape[0]*P_Matrix[:,2:-1,1:-1].shape[1])
 # print((P_Matrix[:,2:-1,1:-1]))
 # print( P_Matrix[:,2:-1,1:-1].shape[0]*P_Matrix[:,2:-1,1:-1].shape[1])
-print(P_Hom_mean)
-print(P_Hom_std)
-print(P_Hom_sem)
+# print(P_Hom_mean)
+# print(P_Hom_std)
+# print(P_Hom_sem)
 meanstd_hom = np.array([3.0609518709544905, 2.9058740060196473, 2.5327468220836034, 1.6194550102161929])
 stdstd_hom = np.array([0.508958148510818, 0.618839073735935, 0.6038044325544453, 0.5369453932178103])
 semstd_hom = np.array([0.29384712404897434, 0.20627969124531167, 0.2012681441848151, 0.17898179773927012])
 #### PLOTTING ####
 #### PLOTTING ####
 #### PLOTTING ####
+
+PSEM_Hom_mean = np.mean(PSEM_Matrix[2:-1,1:-1])
+PSEM_Hom_std = np.std(PSEM_Matrix[2:-1,1:-1])
+PSEM_Hom_sem = np.std(PSEM_Matrix[2:-1,1:-1])/np.sqrt(P_Matrix[:,2:-1,1:-1].shape[0]*P_Matrix[:,2:-1,1:-1].shape[1])
+
+print(PSEM_Hom_mean)
+print(PSEM_Hom_std)
+print(PSEM_Hom_sem)
+
+scope_sem = np.array([13,14,20])
+meansem_hom = np.array([1.5848983129957606,1.3031104776606717,0.8510225461213561])
+semsem_hom = np.array([0.07614570548795169,0.15708604238204218,0.053547249218584086])
 
 #### STRÅLINGSINTENSITETPLOT ####
 # intesitetsregulering i plottene så de bliver ensartede og sammenlignbare
@@ -253,7 +265,7 @@ SEM_max = S_max # SEM_Matrix.max()
 
 FS = 14 # fontsixe til superoverskrift
 fs = FS - 2  # fontsize til lengend()
-FFS = FS + 1
+FFS = FS + 3
 titlecorrection = [0, 0.03, 1, 0.95]
 ylimits = (0.91, 1.09)
 
@@ -410,15 +422,15 @@ figd, axd = plt.subplots()
 # axd.set_title(titled%(SSD, t), fontsize=FS)
 axd.plot(NormArray[0], ".", label="normaliseret måling")
 axd.set_ylim(ylimits)
-axd.set_xlabel("Målingsindeks",fontsize = fs)
-axd.set_ylabel("Normaliseret måling og gennemsnit",fontsize = fs)
+axd.set_xlabel("Målingsindeks",fontsize = FS)
+axd.set_ylabel("Normaliseret måling og gennemsnit",fontsize = FS)
 avg0 = np.mean(NormArray[0])
 sem0 = np.std(NormArray[0])/np.sqrt(len(NormArray[0]))
 # axd.fill_between(np.array(len(NormArray_wi[0])),avg_wi0-sem_wi0, avg_wi0+sem_wi0)
 axd.axhline(y=avg0,label="gennemsnit: %.3f±%.3f"%(avg0, sem0), color="red")
 axd.axhline(y=1, linestyle='dotted', color="lightgray")
 axd.legend(fontsize = fs)
-axd.tick_params(axis='both', which='major', labelsize=fs)
+axd.tick_params(axis='both', which='major', labelsize=FS)
 
 a=axd.get_xticks().tolist()
 if n == 1:
@@ -428,7 +440,7 @@ else:
     axd.set_xticks(np.array([0,30,60,89]))  #np.linspace(0,int(n*N-1),2))
     a = [1,31,61,90]
 axd.set_xticklabels(a)
-plt.yticks(fontsize = fs)
+plt.yticks(fontsize = FS)
 plt.tight_layout()
 # plt.tight_layout(rect=titlecorrection)
 plt.savefig("%s_%s_norm_rest.pdf"%(SSD,t))
@@ -442,12 +454,12 @@ fige, axe = plt.subplots()
 # axe.set_title(titlee, fontsize=FS)
 axe.plot(scope,first_meas_norms, "r", label="$\\delta(t)$")
 axe.fill_between(scope, first_meas_norms-first_meas_sems, first_meas_norms+first_meas_sems, alpha=0.3,label="SEM")
-axe.set_xlabel("Eksponeringstid (s)",fontsize=fs)
-axe.set_ylabel("Kalibreringsfaktor $\\delta(t)$",fontsize=fs)
-axe.legend(fontsize = fs)
+axe.set_xlabel("Eksponeringstid (s)",fontsize=FS)
+axe.set_ylabel("Kalibreringsfaktor $\\delta(t)$",fontsize=FS)
+axe.legend(fontsize = FS)
 # axe.set_yticks([1.006, 1.008, 1.010, 1.012, 1.014, 1.016, 1.018, 1.020, 1.022, 1.024, 1.026, 1.028])
-plt.xticks(fontsize=fs)
-plt.yticks(fontsize=fs)
+plt.xticks(fontsize=FS)
+plt.yticks(fontsize=FS)
 plt.tight_layout()
 # plt.tight_layout(rect=titlecorrection)
 plt.savefig("Kalib_faktor_over_tid.pdf")
@@ -456,14 +468,14 @@ plt.savefig("Kalib_faktor_over_tid.pdf")
 figf, axf = plt.subplots()
 # axe.set_title(titlee, fontsize=FS)
 im = mpimg.imread('gitter.png')
-axf.imshow(im, extent=[11.5,14.35,1.5,2.26], aspect='auto')
-axf.plot(scope,meanstd_hom, label="$\\langle$SD$(t)\\rangle$")
+axf.imshow(im, extent=[11.5,14.65,1.5,2.26], aspect='auto')
+axf.plot(scope,meanstd_hom, label="$\\langle$SD$\\rangle(t)$")
 axf.fill_between(scope, meanstd_hom - semstd_hom, meanstd_hom + semstd_hom,alpha=0.3,label="SEM")
-axf.set_xlabel("Eksponeringstid (s)",fontsize=fs)
-axf.set_ylabel("Gnsn standardafvig $\\langle$SD$(t)\\rangle$ (%)",fontsize=fs)
-axf.legend(fontsize = fs)
-plt.xticks(fontsize=fs)
-plt.yticks(fontsize=fs)
+axf.set_xlabel("Eksponeringstid (s)",fontsize=FS)
+axf.set_ylabel("Gnsn standardafvig $\\langle$SD$\\rangle(t)$ (%)",fontsize=FS)
+axf.legend(fontsize = FS)
+plt.xticks(fontsize=FS)
+plt.yticks(fontsize=FS)
 plt.tight_layout()
 # plt.tight_layout(rect=titlecorrection)
 plt.savefig("Gnsn_std_afvig.pdf")
@@ -471,22 +483,38 @@ plt.savefig("Gnsn_std_afvig.pdf")
 titleg = "Kalibreringsfaktor $\\delta(t)$ for kort eksponering uden førstemåling"
 figg, axg = plt.subplots()
 # axg.set_title(titlee, fontsize=FS)
-axg.plot(scope,first_meas_norms_wi0, "g", label="$\\delta(t)$ (uden indeks 1)")
+axg.plot(scope,first_meas_norms_wi0, "m", label="$\\delta(t)$ (uden indeks 1)")
 axg.fill_between(scope, first_meas_norms_wi0-first_meas_sems_wi0, first_meas_norms_wi0+first_meas_sems_wi0,alpha=0.3,label="SEM")
 axg.plot(scope,first_meas_norms, "r--", label="$\\delta(t)$")
 axg.fill_between(scope, first_meas_norms-first_meas_sems, first_meas_norms+first_meas_sems,alpha=0.3,label="SEM")
-axg.set_xlabel("Eksponeringstid (s)",fontsize=fs)
-axg.set_ylabel("Kalibreringsfaktor $\\delta(t)$",fontsize=fs)
-axg.legend(fontsize = fs)
+axg.set_xlabel("Eksponeringstid (s)",fontsize=FS)
+axg.set_ylabel("Kalibreringsfaktor $\\delta(t)$",fontsize=FS)
+axg.legend(fontsize = FS)
 # axg.set_yticks([1.006, 1.008, 1.010, 1.012, 1.014, 1.016, 1.018, 1.020, 1.022, 1.024, 1.026, 1.028])
-plt.xticks(fontsize=fs)
-plt.yticks(fontsize=fs)
+plt.xticks(fontsize=FS)
+plt.yticks(fontsize=FS)
 plt.tight_layout()
 # plt.tight_layout(rect=titlecorrection)
 plt.savefig("Kalib_faktor_over_tid_renset.pdf")
 
 
+# titlef = "Gennemsnitligt standardfejl i det homogene felt som funktion af eksponeringstid"
+figh, axh = plt.subplots()
+# axe.set_title(titlee, fontsize=FS)
+im = mpimg.imread('gitter.png')
+# axh.imshow(im, extent=[17.3,20.3,1.07,1.47], aspect='auto')
+axh.imshow(im, extent=[12.6,15.2,0.8,1.13], aspect='auto')
+axh.plot(scope_sem,meansem_hom, "g", label="$\\langle$SEM$\\rangle(t)$")
 
+axh.fill_between(scope_sem, meansem_hom - semsem_hom, meansem_hom + semsem_hom,alpha=0.3,label="SEM")
+axh.set_xlabel("Eksponeringstid (s)",fontsize=FS)
+axh.set_ylabel("Gnsn standardfejl $\\langle$SEM$\\rangle(t)$ (%)",fontsize=FS)
+axh.legend(fontsize = FS)
+plt.xticks(fontsize=FS)
+plt.yticks(fontsize=FS)
+plt.tight_layout()
+# plt.tight_layout(rect=titlecorrection)
+plt.savefig("Gnsn_SEM.pdf")
 
 
 

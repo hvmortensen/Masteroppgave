@@ -10,27 +10,39 @@ kTP = 1.018
 NK = 43.77
 K = NK*ku*muen_over_rho*pu*kTP
 
-def CHRG(d):
-    return d/K
 
-print (CHRG(1000))
+def CHRG(Dose):
+    return Dose/K
+print (CHRG(500))
 
 
 
 
 # ## Målinger for t sekunder
-# ## Plexiboxen blev skubbet lidt rundt for at finde det bedste sted:
-# ## + 13 cm fra døren og - 13 cm fra højre kant
+# ## Celleflaskebeholderen blev skubbet lidt rundt for at finde det bedste sted:
+# ## + 13 cm fra kanten af pladen ved døren og - 13 cm fra højre kant
 # ## Tape med sort streg markerer positionen og flaskespidserne peger i y-retning
 
-# ## De bedste resultater NB! FORKERT OMREGNINGSFAKTOR
-# ## For 0.1 Gy fandt vi 20 s til at give en gennemsnitlig dose på 0.105 Gy
-# ## For 0.2 Gy fandt vi 36 s til at give en gennemsnitlig dose på 0.202 Gy
-# ## For 0.3 Gy fandt vi 52 s til at give en gennemsnitlig dose på 0.302 Gy
-# ## For 0.5 Gy fandt vi 85 s til at give en gennemsnitlig dose på 0.302 Gy
+
+
+# ## SSD50
+# #05.03.21 efter rep
+t = 17
+a1 = np.array([1.99, 1.98, 1.98, 1.90, 1.93, 1.91, 1.89, 1.91, 1.90, 1.88])
+a2 = np.array([1.90, 1.94, 1.97, 1.90, 1.91, 1.97, 1.92, 1.94, 1.93, 1.97])
+a3 = np.array([1.88, 1.85, 1.86, 1.95, 1.88, 1.88, 1.87, 1.97, 1.85, 1.86])
+a4 = np.array([1.96, 1.94, 1.97, 1.98, 1.87, 1.91, 1.90, 1.92, 1.95, 1.91])
+
+# t = 18
+# a1 = np.array([2.12, 2.11, 2.04, 2.10, 2.12, 2.07, 2.10, 2.11, 2.11, 2.12])
+# a2 = np.array([2.10, 2.00, 2.13, 2.06, 1.99, 2.12, 2.06, 2.11, 2.07, 2.13])
+# a3 = np.array([2.06, 2.04, 2.01, 2.06, 2.08, 2.07, 2.01, 1.98, 1.97, 2.11])
+# a4 = np.array([2.02, 2.03, 2.09, 2.06, 2.08, 2.05, 1.99, 2.00, 2.07, 2.03])
+
+
 
 #
-#
+# # 05.01.21 før rep
 # t = 19
 # a1 = np.array([2.20, 2.31, 2.15, 2.25, 2.22, 2.26, 2.21, 2.23, 2.29, 2.23])
 # a2 = np.array([2.32, 2.32, 2.26, 2.25, 2.28, 2.30, 2.26, 2.27, 2.18, 2.27])
@@ -58,7 +70,39 @@ print (CHRG(1000))
 # a4 = np.array([4.59, 4.56, 4.67, 4.64, 4.55, 4.57, 4.59, 4.66, 4.60, 4.55])
 
 
+# # 05.03.21 efter rep
+# t = 32
+# a1 = np.array([4.01, 4.01, 4.03, 3.98, 4.08, 4.01, 3.98, 3.99, 4.00, 4.03])
+# a2 = np.array([4.10, 3.97, 4.02, 4.06, 4.06, 3.97, 3.98, 4.05, 4.02, 4.05])
+# a3 = np.array([3.95, 4.00, 4.09, 4.04, 4.00, 4.00, 4.05, 4.02, 4.06, 4.05])
+# a4 = np.array([3.97, 4.08, 3.98, 3.98, 4.09, 4.01, 4.03, 4.04, 3.97, 3.96])
+#
+# t = 33
+# a1 = np.array([4.14, 4.14, 4.24, 4.20, 4.15, 4.25, 4.23, 4.20, 4.16, 4.17])
+# a2 = np.array([4.25, 4.22, 4.22, 4.13, 4.18, 4.16, 4.11, 4.18, 4.22, 4.13])
+# a3 = np.array([4.14, 4.05, 4.07, 4.15, 4.18, 4.07, 4.16, 4.09, 4.08, 4.19])
+# a4 = np.array([4.12, 4.18, 4.12, 4.21, 4.10, 4.20, 4.20, 4.10, 4.11, 4.16])
+#
 
+
+# # 05.03.21 efter rep
+# t = 47
+# a1 = np.array([6.11, 6.15, 6.13, 6.22, 6.21, 6.11, 6.12, 6.17, 6.15, 6.09])
+# a2 = np.array([6.24, 6.09, 6.14, 6.11, 6.12, 6.16, 6.16, 6.08, 6.14, 6.20])
+# a3 = np.array([6.16, 6.10, 6.11, 6.12, 6.07, 6.16, 6.07, 6.11, 6.03, 6.14])
+# a4 = np.array([6.12, 6.09, 6.07, 6.11, 6.03, 6.12, 6.08, 6.03, 6.12, 6.05])
+
+# t = 48
+# a1 = np.array([])
+# a2 = np.array([])
+# a3 = np.array([])
+# a4 = np.array([6.28, 6.24, 6.29, 6.31, 6.23, 6.18, 6.23, 6.22, 6.29, 6.18])
+#
+
+
+
+
+# # 05.01.21 før rep
 # t = 51
 # a1 = np.array([6.71, 6.66, 6.79, 6.70, 6.76])
 # a2 = np.array([6.78, 6.69, 6.71, 6.79, 6.71])
@@ -71,7 +115,9 @@ print (CHRG(1000))
 # a3 = np.array([6.91, 6.83, 6.91, 6.88, 6.88])
 # a4 = np.array([6.84, 6.86, 6.81, 6.80, 6.88])
 
+
 #
+# # 05.01.21 før rep
 # t = 53
 # a1 = np.array([7.14, 7.09, 7.12, 7.06, 6.99])
 # a2 = np.array([7.09, 7.06, 6.99, 6.98, 7.03])
@@ -80,6 +126,23 @@ print (CHRG(1000))
 #
 
 
+# # 05.03.21 efter rep
+
+# t = 76
+# a1 = np.array([])
+# a2 = np.array([10.23, 10.15, 10.23, 10.23, 10.18])
+# a3 = np.array([10.16, 10.16, 10.14, 10.23, 10.07, 10.13, 10.06, 10.13, 10.14, 10.14])
+# a4 = np.array([10.21, 10.22, 10.11, 10.15, 10.16, 10.24, 10.18, 10.11, 10.22, 10.16])
+# #
+#
+# t = 77
+# a1 = np.array([])
+# a2 = np.array([])
+# a3 = np.array([10.24, 10.35, 10.26, 10.29, 10.31])
+# a4 = np.array([10.27, 10.37, 10.31, 10.26, 10.28, 10.30, 10.34, 10.32, 10.29, 10.37])
+
+
+# # 05.01.21 før rep
 # t = 85
 # a1 = np.array([11.50, 11.48, 11.59, 11.53, 11.53])
 # a2 = np.array([11.56, 11.54, 11.56, 11.55, 11.45])
@@ -128,11 +191,11 @@ print (CHRG(1000))
 # a3 = np.array([1.96, 2.05, 1.99, 2.05, 2.03])
 # a4 = np.array([2.12, 2.00, 2.06, 1.90, 1.94])
 # #
-t = 13
-a1 = np.array([])
-a2 = np.array([])
-a3 = np.array([])
-a4 = np.array([2.17, 2.29, 2.24, 2.23, 2.10])
+# t = 13
+# a1 = np.array([])
+# a2 = np.array([])
+# a3 = np.array([])
+# a4 = np.array([2.17, 2.29, 2.24, 2.23, 2.10])
 # #
 # t = 12
 # a1 = np.array([])
@@ -165,6 +228,8 @@ print ()
 print ()
 
 A = np.array([avg1, avg2, avg3, avg4])
+# A = np.array([a1, a2, a3, a4])
+
 
 avg_box = np.mean(A)
 std_box = np.std(A)
@@ -185,7 +250,7 @@ plt.title('Doser målt for %i sekunders eksponering' %t )
 plt.legend(['Rum 1', 'Rum 2', 'Rum 3', 'Rum 4'])
 plt.ylabel('Dose (Gy)')
 plt.xlabel('# Måling')
-# plt.show()
+plt.show()
 
 # ############################
 
