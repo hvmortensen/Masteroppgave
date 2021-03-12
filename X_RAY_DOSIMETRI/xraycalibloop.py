@@ -15,7 +15,8 @@ Udregner afviget i den i'ende måling i hvert punktmålingssæt.
 Standardafvig i procent.
 
 Dosen udregnes ved at gange målingen med en kalibreringsfaktor:
-K = 43.77 ± 0.039 mGy/nC (milliGray/nanoCoulomb)
+K = 43.77 ± 0.039 mGy/nC (milliGray/nanoCoulomb).
+Korrektionsfaktorer tilføjes til kalibreringsfaktoren.
 
 Forsøget gentages n gange.
 Gennemsnitsdosen findes ved at tage gennemsnittet af gennemsnitsdoserne fra
@@ -35,16 +36,6 @@ import matplotlib.pyplot as plt
 from matplotlib import cycler
 from matplotlib.offsetbox import TextArea, DrawingArea, OffsetImage, AnnotationBbox, AnchoredOffsetbox
 import matplotlib.image as mpimg
-# colors = cycler('color',
-#                 ['#EE6666', '#3388BB', '#9988DD',
-#                  '#EECC55', '#88BB44', '#FFBBBB'])
-# plt.rc('grid', color='w', linestyle='solid')
-# plt.rc('axes', facecolor='#E6E6E6', edgecolor='none',
-#        axisbelow=True, grid=True, prop_cycle=colors)
-# plt.rc('xtick', direction='out', color='gray')
-# plt.rc('ytick', direction='out', color='gray')
-# plt.rc('patch', edgecolor='#E6E6E6')
-# plt.rc('lines', linewidth=2)
 
 #### KONSTANTER ####
 #omregningsfaktor K for dosimeteret i mGy/nC (milliGray pr nanoCoulomb)
@@ -64,7 +55,7 @@ filename = 'xray_data_SSD50_20s.txt'; t = 20; SSD = "SSD50"
 # filename = 'xray_data_SSD40_14s.txt'; t = 14; SSD = "SSD40"
 # filename = 'xray_data_SSD40_13s.txt'; t = 13; SSD = "SSD40"
 # filename = 'xray_data_SSD37_5_12s.txt'; t = 12; SSD = "SSD37_5"
-
+print("t =", t)
 # sortér data i kolonner
 data = np.loadtxt(filename)
 f = data[0:,0]      # første kolonne = eksperiment nummer
@@ -89,7 +80,7 @@ for i in range(N*n):
 #### UDREGN GENNEMSNITTET AF MÅLINGERNE I HVERT PUNKT OG OMREGN TIL DOSIS ####
 D_Matrix = np.zeros((n, y, x))                # 3 6x5-matricer med hvert enkelt forsøgs dosisgnsn i hver sin matrice
 S_Matrix = np.zeros((n, y, x))                # 3 6x5-matricer med hvert enkelt forsøgs SD i hver sin matrice
-P_Matrix = np.zeros((n, y, x))
+P_Matrix = np.zeros((n, y, x))                # 3 6x5-matricer med hvert enkelt forsøgs SD i i procent hver sin matrice
 
 d_matrix = np.zeros((y, x))                   # 6x5-matrice: dosisgnsn som rækker
 s_matrix = np.zeros((y, x))                   # 6x5-matrice: SD som rækker
@@ -134,8 +125,8 @@ for i in range(N):                                          # gå igennem alle m
         PointErrors[j] = np.mean(DD[i + N*j])               # gnsn af alle punkters fejl fra hvert forsøg
     Mean_Of_Total[i] = np.mean(AllPoints)                   # N-matrice med gnsn af alle målinger i hvert målepunkt
     Mean_Of_Means[i] = np.mean(PointMeans)                  # N-matrice med gnsn af gnsn i hvert målepunkt (skal give samme som ovenstående)
-    SE[i] = (np.std(AllPoints)/np.sqrt(n*m))                # SE i hvert målepunkt
-    SEM[i] = (np.std(PointMeans)/np.sqrt(n))                # SEM i hvert målepunkt
+    SE[i] = np.std(AllPoints)/np.sqrt(n*m)                # SE i hvert målepunkt
+    SEM[i] = np.std(PointMeans)/np.sqrt(n)                # SEM i hvert målepunkt
     # SE[i] = np.sqrt( (np.std(AllPoints)/np.sqrt(n*m))**2 + np.mean(AllErrors)**2 )      # SE i hvert målepunkt
     # SEM[i] = np.sqrt( (np.std(PointMeans)/np.sqrt(n))**2 + np.mean(PointErrors)**2 )    # SEM i hvert målepunkt
 
@@ -222,28 +213,41 @@ P_Hom_std = np.std(P_Matrix[:,2:-1,1:-1])
 P_Hom_sem = np.std(P_Matrix[:,2:-1,1:-1])/np.sqrt(P_Matrix[:,2:-1,1:-1].shape[0]*P_Matrix[:,2:-1,1:-1].shape[1])
 # print((P_Matrix[:,2:-1,1:-1]))
 # print( P_Matrix[:,2:-1,1:-1].shape[0]*P_Matrix[:,2:-1,1:-1].shape[1])
-# print(P_Hom_mean)
-# print(P_Hom_std)
-# print(P_Hom_sem)
+print("P_Hom_mean =", P_Hom_mean)
+print("P_Hom_std =", P_Hom_std)
+print("P_Hom_sem =", P_Hom_sem)
 meanstd_hom = np.array([3.0609518709544905, 2.9058740060196473, 2.5327468220836034, 1.6194550102161929])
 stdstd_hom = np.array([0.508958148510818, 0.618839073735935, 0.6038044325544453, 0.5369453932178103])
 semstd_hom = np.array([0.29384712404897434, 0.20627969124531167, 0.2012681441848151, 0.17898179773927012])
-#### PLOTTING ####
-#### PLOTTING ####
-#### PLOTTING ####
 
 PSEM_Hom_mean = np.mean(PSEM_Matrix[2:-1,1:-1])
 PSEM_Hom_std = np.std(PSEM_Matrix[2:-1,1:-1])
 PSEM_Hom_sem = np.std(PSEM_Matrix[2:-1,1:-1])/np.sqrt(P_Matrix[:,2:-1,1:-1].shape[0]*P_Matrix[:,2:-1,1:-1].shape[1])
 
-print(PSEM_Hom_mean)
-print(PSEM_Hom_std)
-print(PSEM_Hom_sem)
+print("PSEM_Hom_mean =", PSEM_Hom_mean)
+print("PSEM_Hom_std =", PSEM_Hom_std)
+print("PSEM_Hom_sem =", PSEM_Hom_sem)
 
 scope_sem = np.array([13,14,20])
-meansem_hom = np.array([1.5848983129957606,1.3031104776606717,0.8510225461213561])
-semsem_hom = np.array([0.07614570548795169,0.15708604238204218,0.053547249218584086])
+meansem_hom = np.array([0.8510225461213561,1.3031104776606717,1.5848983129957606])
+semsem_hom = np.array([0.053547249218584086,0.15708604238204218,0.07614570548795169])
 
+PSE_Hom_mean = np.mean(PSE_Matrix[2:-1,1:-1])
+PSE_Hom_std = np.std(PSE_Matrix[2:-1,1:-1])
+PSE_Hom_sem = np.std(PSE_Matrix[2:-1,1:-1])/np.sqrt(P_Matrix[:,2:-1,1:-1].shape[0]*P_Matrix[:,2:-1,1:-1].shape[1])
+
+print("PSE_Hom_mean =", PSE_Hom_mean)
+print("PSE_Hom_std =", PSE_Hom_std)
+print("PSE_Hom_sem =", PSE_Hom_sem)
+
+scope_se = np.array([12, 13,14,20])
+meanse_hom = np.array([0.9679579720369986,0.6064155326271928,0.9079906658732457,0.8353226395519263])
+semse_hom = np.array([0.09292261958847979,0.015456749637387001,0.03778216140825923,0.029387005381193845])
+
+
+#### PLOTTING ####
+#### PLOTTING ####
+#### PLOTTING ####
 #### STRÅLINGSINTENSITETPLOT ####
 # intesitetsregulering i plottene så de bliver ensartede og sammenlignbare
 # faste intensitetsværdier på alle fejlplot så de kan sammenlignes på tværs af forsøg
@@ -503,7 +507,7 @@ figh, axh = plt.subplots()
 # axe.set_title(titlee, fontsize=FS)
 im = mpimg.imread('gitter.png')
 # axh.imshow(im, extent=[17.3,20.3,1.07,1.47], aspect='auto')
-axh.imshow(im, extent=[12.6,15.2,0.8,1.13], aspect='auto')
+axh.imshow(im, extent=[12.6+5,15.2+5,0.8,1.13], aspect='auto')
 axh.plot(scope_sem,meansem_hom, "g", label="$\\langle$SEM$\\rangle(t)$")
 
 axh.fill_between(scope_sem, meansem_hom - semsem_hom, meansem_hom + semsem_hom,alpha=0.3,label="SEM")
@@ -578,4 +582,4 @@ plt.savefig("Gnsn_SEM.pdf")
 # print("antal forsøg kørt: %s " %(n))
 # print()
 
-plt.show()
+# plt.show()

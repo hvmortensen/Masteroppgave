@@ -3,6 +3,10 @@
 # Filtrering: 1.52 mm Al + 2.60 mm Cu.
 # Spænding over røntgenrøret: 220 kV (kiloVolt).
 # Katodestrøm: 10 mA (milliAmpere).
+# Første kolonne: Førsøgnummer
+# Anden kolonne: y-koordinat
+# Tredje kolonne: x-koordinat
+# Resterende kolonner: Aflæsninger
 
 0 0 0 0.42 0.42 0.40 0.43 0.42 0.43 0.43 0.42 0.41 0.42
 0 0 1 1.21 1.20 1.19 1.19 1.21 1.23 1.31 1.22 1.24 1.27
