@@ -36,6 +36,13 @@ import matplotlib.pyplot as plt
 from matplotlib import cycler
 from matplotlib.offsetbox import TextArea, DrawingArea, OffsetImage, AnnotationBbox, AnchoredOffsetbox
 import matplotlib.image as mpimg
+import matplotlib as mpl
+
+mpl.rcParams['mathtext.fontset'] = 'cm'
+mpl.rcParams['mathtext.rm'] = 'cm'
+mpl.rcParams['font.sans-serif'] = 'Times New Roman'
+mpl.rcParams['font.family'] = 'Times New Roman'
+
 
 #### KONSTANTER ####
 #omregningsfaktor K for dosimeteret i mGy/nC (milliGray pr nanoCoulomb)
@@ -52,8 +59,8 @@ DC = 0.02
 
 #### VÆLG TXT.-FIL SOM SKAL KØRES ####
 filename = 'xray_data_SSD50_20s.txt'; t = 20; SSD = "SSD50"
-# filename = 'xray_data_SSD40_14s.txt'; t = 14; SSD = "SSD40"
-# filename = 'xray_data_SSD40_13s.txt'; t = 13; SSD = "SSD40"
+filename = 'xray_data_SSD40_14s.txt'; t = 14; SSD = "SSD40"
+filename = 'xray_data_SSD40_13s.txt'; t = 13; SSD = "SSD40"
 # filename = 'xray_data_SSD37_5_12s.txt'; t = 12; SSD = "SSD37_5"
 print("t =", t)
 # sortér data i kolonner
@@ -256,7 +263,7 @@ D_max = D_Matrix.max()
 S_min = 1 #S_Matrix.min()
 S_max = 3.3 #S_Matrix.max()
 P_min = 1 #S_Matrix.min()
-P_max = 4 #S_Matrix.max()
+P_max = 4.5 #S_Matrix.max()
 
 
 DM_min = D_min
@@ -267,7 +274,7 @@ SEM_min = S_min # SEM_Matrix.min()
 SEM_max = S_max # SEM_Matrix.max()
 
 
-FS = 14 # fontsixe til superoverskrift
+FS = 14+3 # fontsixe til superoverskrift
 fs = FS - 2  # fontsize til lengend()
 FFS = FS + 3
 titlecorrection = [0, 0.03, 1, 0.95]
@@ -309,7 +316,7 @@ else:
         axa[0,i].invert_yaxis()
         axa[0,i].tick_params(axis='both', which='major', labelsize=fs)
         axa[0,i].set_xticks([0,1,2,3,4])
-        axa[1,i].imshow(S_Matrix[i], vmin=P_min, vmax=P_max, cmap=plt.cm.Blues,interpolation='lanczos')
+        axa[1,i].imshow(P_Matrix[i], vmin=P_min, vmax=P_max, cmap=plt.cm.Blues,interpolation='lanczos')
         axa[1,i].set_title("Standardafvig (%)",fontsize=FS)
         axa[1,i].invert_yaxis()
         axa[1,i].tick_params(axis='both', which='major', labelsize=fs)
@@ -582,4 +589,4 @@ plt.savefig("Gnsn_SEM.pdf")
 # print("antal forsøg kørt: %s " %(n))
 # print()
 
-# plt.show()
+plt.show()

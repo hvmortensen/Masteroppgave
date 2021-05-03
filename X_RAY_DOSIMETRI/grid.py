@@ -3,6 +3,12 @@ import matplotlib.pyplot as plt
 from matplotlib import cycler
 from matplotlib.offsetbox import TextArea, DrawingArea, OffsetImage, AnnotationBbox
 import matplotlib.image as mpimg
+import matplotlib as mpl
+
+mpl.rcParams['mathtext.fontset'] = 'cm'
+mpl.rcParams['mathtext.rm'] = 'cm'
+mpl.rcParams['font.sans-serif'] = 'Times New Roman'
+mpl.rcParams['font.family'] = 'Times New Roman'
 
 
 colors = cycler('color',
@@ -16,7 +22,7 @@ plt.rc('patch', edgecolor='#E6E6E6')
 plt.rc('lines', linewidth=2)
 
 
-FS = 14 # fontsixe til superoverskrift
+FS = 14+3 # fontsixe til superoverskrift
 fs = FS - 2  # fontsize til lengend()
 FFS = FS + 3
 fig, axq = plt.subplots()
@@ -108,14 +114,14 @@ plt.axvline(x=x, ymin=0, ymax=0.28, color='midnightblue')
 
 # gitteret på perspexpladen
 grid = np.zeros( (yy,xx) )
-grid[2:-1,1:-1] = 1
+# grid[2:-1,1:-1] = 1
 
 axq.imshow(grid, cmap=plt.cm.Blues, vmin=grid.min(), vmax=2,interpolation='none')
-# axq.invert_yaxis()
-axq.tick_params(axis='both', which='major', labelsize=fs)
-# axq.set_xticks([])
-# axq.set_yticks([])
+axq.invert_yaxis()
+axq.tick_params(axis='both', which='major', labelsize=FS)
+axq.set_xticks([0,1,2,3,4])
+axq.set_yticks([0,1,2,3,4,5])
 plt.tight_layout()
 # plt.draw()
-plt.savefig("gitter.png")
+plt.savefig("gitter1.pdf")
 plt.show()
