@@ -3,9 +3,16 @@ import matplotlib.pyplot as plt
 from matplotlib import cycler
 from matplotlib.offsetbox import TextArea, DrawingArea, OffsetImage, AnnotationBbox
 import matplotlib.image as mpimg
+import matplotlib as mpl
 
-FS = 14 # fontsixe til superoverskrift
-fs = 15   # fontsize til lengend()
+mpl.rcParams['mathtext.fontset'] = 'cm'
+mpl.rcParams['mathtext.rm'] = 'cm'
+mpl.rcParams['font.sans-serif'] = 'Times New Roman'
+mpl.rcParams['font.family'] = 'Times New Roman'
+
+
+FS = 14+3 # fontsixe til superoverskrift
+fs = FS + 3   # fontsize til lengend()
 FFS = FS + 1
 
 o = 2
@@ -37,9 +44,9 @@ h = 0.0037
 
 xx = 0.77
 yy = 0.05
-
-im = mpimg.imread('rho.png')
-ax.imshow(im, extent=[xx,xx+w, yy, yy+h], aspect='auto')
+#
+# im = mpimg.imread('rho.png')
+# ax.imshow(im, extent=[xx,xx+w, yy, yy+h], aspect='auto')
 
 ax.plot(x, gauss(x), linewidth=2)
 ax.axvline(x=0, ymin=0.04, ymax=0.98, color="k")
@@ -55,6 +62,7 @@ ax.set_yticklabels([])
 # ax.legend(fontsize=fs)
 plt.xticks(fontsize=fs)
 plt.yticks(fontsize=fs)
+ax.text(0.8,0.05 ,"$\\sigma$",fontsize=fs)
 plt.draw()
 plt.tight_layout()
 plt.savefig("Gausscurve.pdf")
