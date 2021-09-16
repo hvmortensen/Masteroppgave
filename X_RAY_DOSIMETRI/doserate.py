@@ -39,6 +39,8 @@ b_s = np.array([bs13,bs22,bs32,bs51,bs98])
 
 al = np.linspace(13,98,1001)
 
+al1 = np.linspace(0,1000,10001)
+
 FS = 17+3; fs = FS - 2  # fontsize til lengend()
 
 fl = np.polyfit(bc,b,1)
@@ -105,8 +107,11 @@ plt.tight_layout()
 plt.savefig("Doserate.pdf")
 plt.show()
 
-r1 = 40
-r2 = 50
+plex = 1.5
+fejl = 2.2
+
+r1 = 40 - plex + fejl
+r2 = 50 - plex + fejl
 konv = (f(20000000)*r1**2)/(g(20000000)*r2**2)
 FS = FS - 3
 plt.plot(al, (f(al)*r1**2)/(g(al)*r2**2), label="$\\frac{I_1(t)\\cdot r_1^2}{I_2(t)\\cdot r_2^2}=\\frac{f(t)\\cdot (40cm)^2}{g(t)\\cdot (50cm)^2}\\approx1$")
@@ -117,20 +122,24 @@ plt.xlabel("Eksponeringstid (s)",fontsize=FS)
 plt.xticks([10,20,30,40,50,60,70,80,90,100])
 plt.legend(fontsize=(FS+2))
 plt.tight_layout()
+plt.savefig("Afst_kvadr_lov.pdf")
 plt.show()
 
 
 al = np.linspace(0,98)
-FS = FS - 3
-plt.plot(al,f(al),label="$f(t)=%.2ft%.2f = 0 \\Rightarrow t = %.2fs$"%(m,l,-l/m))
-plt.plot(al,g(al),label="$g(t)=%.2ft%.2f = 0 \\Rightarrow t = %.2fs$"%(c,d,-d/c))
+plt.plot(al,f(al),label="$f(t)= 0 \\Rightarrow t = %.2f$ s"%(-l/m))
+plt.plot(al,g(al),label="$g(t)= 0 \\Rightarrow t = %.2f$ s"%(-d/c))
+plt.plot( (d - l)/(m - c),f((d - l)/(m - c)),"k.", label="$f(t) = g(t)\\Rightarrow t = %.2f$ s"%( (d - l)/(m - c)) )
+plt.axhline(0, linestyle='--', color='k')
 plt.xlabel("Eksponeringstid (s)",fontsize=FS)
 plt.ylabel("Dosis (mGy)",fontsize=FS)
 plt.ylim(-40,60)
 plt.xlim(0,8)
+plt.xticks([0,1,2,3,4,5,6,7,8])
 plt.tick_params(axis='both', which='major', labelsize=FS)
-plt.legend(fontsize=FS)
+plt.legend(fontsize=FS-2)
 plt.tight_layout()
+plt.savefig("Dosisskaeringspunkt.pdf")
 plt.show()
 
 

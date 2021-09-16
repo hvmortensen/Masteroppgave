@@ -115,7 +115,7 @@ for i in range(n):                              # gå igennem alle forsøg
 #     P_Hom[i] = p_hom
 # print(P_Hom)
 
-#### MATRICER MED GENNEMSNITSDOSIS, SE, OG SEM I HVERT PUNKT
+#### MATRICER MED GENNEMSNITSDOSIS, SE, OG SEM I HVERT MÅLEPUNKT
 Mean_Of_Total = np.zeros(N)
 Mean_Of_Means = np.zeros(N)
 SE = np.zeros(N)
@@ -175,13 +175,12 @@ NormArray = np.zeros((m, n*N))    # NormArray
 NormArray_wi = np.zeros((m, n*N)) # NormArray without index i
 NormArray_wi0 = np.zeros((m, n*N)) # NormArray without index 0
 
-
 # udregn normaliserede værdier og fyld matricer til PLOTTING
 for i in range(n*N):                                                        # hele datasættet igennem (90 punkter)
     norm[i] = D[i]/np.mean(D[i])                                            # normaliser alle målinger ift eget punktsæt
     norm_wi0[i] = D[i]/np.mean(D[i,1:])
     for j in range(m):                                                      # 5 eller 10 gange, dvs en gang pr målingsindeks
-        norm_wi[i] = D[i]/np.mean(np.concatenate((D[i,:j], D[i,j+1:])))   # normaliser måling ift resterende målinger (ikke egen måling)
+        norm_wi[i] = D[i]/np.mean(np.concatenate((D[i,:j], D[i,j+1:])))     # normaliser måling ift resterende målinger (ikke egen måling)
         NormArray[j,i] = norm[i,j]                                          # array med til plotting
         NormArray_wi[j,i] = norm_wi[i,j]                                    # array med til plotting
         NormArray_wi0[j,i] = norm_wi0[i,j]
