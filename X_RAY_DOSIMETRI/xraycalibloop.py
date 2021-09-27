@@ -408,63 +408,63 @@ print(PSEtot_Matrix.shape)
 #########
 #########
 
-# #### PLOT FOR AT SE HVOR MEGET ENKELTE MÅLINGER AFVIGER FRA GENNEMSNITTET MÅLINGER I SAMME KOHORT
-# # plt.rc('grid', color='w', linestyle='solid')
-# titlec = " %s, %ss: Alle i'ende-målinger i samme plot normaliseret i forhold til gennemsnittet af punktsættet"
-# if m <= 5:
-#     ylimits = (-7, 7)
-#     figc, axc = plt.subplots(nrows=1,ncols=5,figsize=(14, 3.8), sharey="all")
-#     # figc.suptitle(titlec%(SSD, t), fontsize=FS)
-#     for i in range(m):
-#         avg = np.mean((NormArray[i]-1)*100)
-#         sem = np.std(NormArray[i]*100)/np.sqrt(len(NormArray[i]))
-#         axc[i].axhline(y=avg,label="$%.1f\pm%.1f$"%(avg,sem), color="red")
-#         axc[i].axhline(y=0, linestyle='dotted', color="lightgray")
-#         # axc[i].plot((NormArray[i][:30]-1*100), ".")#, label="norm. måling")
-#         # axc[i].plot((NormArray[i][30:60]-1)*100, ".")#, label="norm. måling")
-#         # axc[i].plot((NormArray[i][60:]-1)*100, ".")#, label="norm. måling")
-#         axc[i].plot((NormArray[i][:30]-1)*100, ".")#, ".", label="norm. måling")
-#         axc[i].plot((NormArray[i][30:60]-1)*100, ".")
-#         axc[i].plot((NormArray[i][60:]-1)*100, ".")
-#         axc[i].set_title("%s.-målinger"%(i+1),fontsize=FS)
-#         axc[i].legend(loc=3, fontsize=fs+1)
-#         axc[i].set_ylim((ylimits))
-#         axc[i].set_xlabel("Målepunkt",fontsize=FS)
-#         axc[0].set_ylabel("Afvig fra gnsn (%)",fontsize=FS)
-#         axc[i].tick_params(axis='both', which='major', labelsize=FS-1)
-#         a=axc[i].get_xticks().tolist()
-#         axc[i].set_xticks(np.array([0, 9, 19, 29]))
-#         a = ["$(0.0)$", "$(1,3)$", "$(3,1)$", "$(4,5)$"]
-#         axc[i].set_xticklabels(a)
-# else:
-#     ylimits = (-9, 9)
-#     figc, axc = plt.subplots(nrows=2,ncols=5,figsize=(14, 7.5), sharey="all")
-#     # figc.suptitle(titlec%(SSD, t), fontsize=FS)
-#     for i in range(2):
-#
-#         for j in range(5):
-#             avg = np.mean(NormArray[j + i*5]-1)*100
-#             sem = np.std(NormArray[j + i*5]*100)/np.sqrt(len(NormArray[i]))
-#             axc[i,j].axhline(y=avg,label="$%.1f\pm%.1f\%%$"%(avg,sem), color="red")
-#             axc[i,j].axhline(y=0, linestyle='dotted', color="lightgray")
-#             axc[i,j].plot((NormArray[j + i*5][:30]-1)*100, ".")#, ".", label="norm. måling")
-#             axc[i,j].plot((NormArray[j + i*5][30:60]-1)*100, ".")
-#             axc[i,j].plot((NormArray[j + i*5][60:]-1)*100, ".")
-#             axc[i,j].set_title("%s.-målinger"%(j + 1 + i*5),fontsize=FS)
-#             axc[i,j].legend(loc=3, fontsize=fs+1)
-#             axc[i,j].set_ylim(ylimits)
-#             axc[i,j].set_xlabel("Målepunkt",fontsize=FS)
-#             axc[i,0].set_ylabel("Afvig fra gnsn (%)",fontsize=FS)
-#             axc[i,j].tick_params(axis='both', which='major', labelsize=FS-1)
-#             a=axc[i,j].get_xticks().tolist()
-#             axc[i,j].set_xticks(np.array([0, 9, 19, 29]))
-#             a = ["$(0.0)$", "$(1,3)$", "$(3,1)$", "$(4,5)$"]
-#
-#             axc[i,j].set_xticklabels(a)
-# plt.tight_layout()
-# # plt.tight_layout(rect=titlecorrection)
-# plt.savefig("%s_%s_norm_rest_alle.pdf"%(SSD,t))
-# # plt.show()
+#### PLOT FOR AT SE HVOR MEGET ENKELTE MÅLINGER AFVIGER FRA GENNEMSNITTET MÅLINGER I SAMME KOHORT
+# plt.rc('grid', color='w', linestyle='solid')
+titlec = " %s, %ss: Alle i'ende-målinger i samme plot normaliseret i forhold til gennemsnittet af punktsættet"
+if m <= 5:
+    ylimits = (-7, 7)
+    figc, axc = plt.subplots(nrows=1,ncols=5,figsize=(14, 3.8), sharey="all")
+    # figc.suptitle(titlec%(SSD, t), fontsize=FS)
+    for i in range(m):
+        avg = np.mean((NormArray[i]-1)*100)
+        sem = np.std(NormArray[i]*100)/np.sqrt(len(NormArray[i]))
+        axc[i].axhline(y=avg,label="$%.1f\pm%.1f$"%(avg,sem), color="red")
+        axc[i].axhline(y=0, linestyle='dotted', color="lightgray")
+        # axc[i].plot((NormArray[i][:30]-1*100), ".")#, label="norm. måling")
+        # axc[i].plot((NormArray[i][30:60]-1)*100, ".")#, label="norm. måling")
+        # axc[i].plot((NormArray[i][60:]-1)*100, ".")#, label="norm. måling")
+        axc[i].plot((NormArray[i][:30]-1)*100, ".")#, ".", label="norm. måling")
+        axc[i].plot((NormArray[i][30:60]-1)*100, ".")
+        axc[i].plot((NormArray[i][60:]-1)*100, ".")
+        axc[i].set_title("%s.-målinger"%(i+1),fontsize=FFS)
+        axc[i].legend(loc=3, fontsize=fs+1)
+        axc[i].set_ylim((ylimits))
+        axc[i].set_xlabel("Målepunkt",fontsize=FFS)
+        axc[0].set_ylabel("Afvig fra gnsn (%)",fontsize=FFS)
+        axc[i].tick_params(axis='both', which='major', labelsize=FFS-1)
+        a=axc[i].get_xticks().tolist()
+        axc[i].set_xticks(np.array([0, 9, 19, 29]))
+        a = ["$(0.0)$", "$(1,3)$", "$(3,1)$", "$(4,5)$"]
+        axc[i].set_xticklabels(a)
+else:
+    ylimits = (-9, 9)
+    figc, axc = plt.subplots(nrows=2,ncols=5,figsize=(14, 7.5), sharey="all")
+    # figc.suptitle(titlec%(SSD, t), fontsize=FS)
+    for i in range(2):
+
+        for j in range(5):
+            avg = np.mean(NormArray[j + i*5]-1)*100
+            sem = np.std(NormArray[j + i*5]*100)/np.sqrt(len(NormArray[i]))
+            axc[i,j].axhline(y=avg,label="$%.1f\pm%.1f\%%$"%(avg,sem), color="red")
+            axc[i,j].axhline(y=0, linestyle='dotted', color="lightgray")
+            axc[i,j].plot((NormArray[j + i*5][:30]-1)*100, ".")#, ".", label="norm. måling")
+            axc[i,j].plot((NormArray[j + i*5][30:60]-1)*100, ".")
+            axc[i,j].plot((NormArray[j + i*5][60:]-1)*100, ".")
+            axc[i,j].set_title("%s.-målinger"%(j + 1 + i*5),fontsize=FFS)
+            axc[i,j].legend(loc=3, fontsize=fs+1)
+            axc[i,j].set_ylim(ylimits)
+            axc[i,j].set_xlabel("Målepunkt",fontsize=FFS)
+            axc[i,0].set_ylabel("Afvig fra gnsn (%)",fontsize=FFS)
+            axc[i,j].tick_params(axis='both', which='major', labelsize=FFS-1)
+            a=axc[i,j].get_xticks().tolist()
+            axc[i,j].set_xticks(np.array([0, 9, 19, 29]))
+            a = ["$(0.0)$", "$(1,3)$", "$(3,1)$", "$(4,5)$"]
+
+            axc[i,j].set_xticklabels(a)
+plt.tight_layout()
+# plt.tight_layout(rect=titlecorrection)
+plt.savefig("%s_%s_norm_rest_alle.pdf"%(SSD,t))
+# plt.show()
 #
 
 

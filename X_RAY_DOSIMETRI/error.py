@@ -14,9 +14,14 @@ kTP = 1.018
 NK = 43.77  # mGy/nC
 K = NK*ku*muen_over_rho*pu*kTP
 dNK = 0.39
+dMu = 0.02
 kTP = (273.15 + 37.1)/(273.15 + 24)
 
-def multi_error(Z, a, da, b, db):
+def multi_error1(Z, a, da):
+    return Z*da/a
+
+
+def multi_error2(Z, a, da, b, db):
     return Z*np.sqrt(( (da/a)**2 + (db/b)**2))
 
 
@@ -58,7 +63,6 @@ s01 = np.std([A18, B18, C18, D18])/np.sqrt(4)
 s02 = np.std([A33, B33, C33, D33])/np.sqrt(4)
 s03 = np.std([A47, B47, C47, D47])/np.sqrt(4)
 s05 = np.std([A76, B76, C76, D76])/np.sqrt(4)
-print(s01)
 
 
 ### B = SSD40
@@ -112,86 +116,72 @@ s50 = np.array([s01, s02, s03, s05])
 t40 = np.array([13, 22, 32, 51, 98])
 t50 = np.array([18, 33, 47, 76])
 
-dMu = 0.02
-dD40 = np.zeros(5)
-D40 = np.zeros(5)
-for i in range(5):
-    D40[i] = m40[i]*K
-    dD40[i] = multi_error(D40[i], m40[i], add_error(s40[i], dMu), NK, dNK)
-    print("Dosis ± Fejl for tid %.1f s = %.1f mGy ± %.1f %%" %(t40[i], D40[i], (dD40[i]/D40[i])*100) )
-
-dD50 = np.zeros(4)
-D50 = np.zeros(4)
-for i in range(4):
-    D50[i] = m50[i]*K
-    dD50[i] = multi_error(D50[i], m50[i], add_error(s50[i], dMu), NK, dNK)
-    print("Dosis ± Fejl for tid %.1f s = %.1f mGy ± %.1f %%" %(t50[i], D50[i], (dD50[i]/D50[i])*100) )
-
-
 bt1 = np.array([3.58, 3.27, 4.14])
 bt2 = np.array([3.34, 3.30, 2.20])
 bt = np.mean([bt1, bt2])
 dbt = np.std([bt1, bt2])/np.sqrt(2)
-# nA = 0.219
+print()
+print("Korrekt tid: Subtraher %.2f ± %.2f \n" %(bt, dbt))
+
+
+
+D40 = np.zeros(5)
+dD40 = np.zeros(5)
+Drt40 = np.zeros(5)
+dDrt40 = np.zeros(5)
+Drs40 = np.zeros(5)
+dDrs40 = np.zeros(5)
+for i in range(5):
+    D40[i] = m40[i]*K
+    dD40[i] = multi_error2(D40[i], m40[i], add_error(s40[i], dMu), NK, dNK)
+
+    Drt40[i] = D40[i]/t40[i]
+    dDrt40[i] = multi_error1(Drt40[i], D40[i], dD40[i])
+
+    Drs40[i] = D40[i]/(t40[i] - bt)
+    dDrs40[i] = multi_error2(Drs40[i], D40[i], dD40[i], bt, dbt)
+    print("%.0f s\nDosis = %.1f mGy ± %.1f%%" %(t40[i], D40[i], dD40[i]/D40[i]*100))
+    print("Teknisk doserate = %.1f mGy/s ± %.1f%%"%(Drt40[i],dDrt40[i]/Drt40[i]*100))
+    print("t = %.1f ± %.1f%% \nSand doserate = %.1f mGy/s ± %.1f%% \n"%(t40[i]-bt, dbt/t40[i]*100,Drs40[i],dDrs40[i]/Drs40[i]*100))
+
+D50 = np.zeros(4)
+dD50 = np.zeros(4)
+Drt50 = np.zeros(4)
+dDrt50 = np.zeros(4)
+Drs50 = np.zeros(4)
+dDrs50 = np.zeros(4)
+for i in range(4):
+    D50[i] = m50[i]*K
+    dD50[i] = multi_error2(D50[i], m50[i], add_error(s50[i], dMu), NK, dNK)
+    Drt50[i] = D50[i]/t50[i]
+    dDrt50[i] = multi_error1(Drt50[i], D50[i], dD50[i])
+    Drs50[i] = D50[i]/(t50[i] - bt)
+    dDrs50[i] = multi_error2(Drs50[i], D50[i], dD50[i], bt, dbt)
+    print("%.0f s\nDosis = %.1f mGy ± %.1f%%" %(t50[i], D50[i], dD50[i]/D50[i]*100))
+    print("Teknisk doserate = %.1f mGy/s ± %.1f%%"%(Drt50[i],dDrt50[i]/Drt50[i]*100))
+    print("t = %.1f ± %.1f%% \nSand doserate = %.1f mGy/s ± %.1f%% \n"%(t50[i]-bt, dbt/t50[i]*100,  Drs50[i],dDrs50[i]/Drs50[i]*100))
+D50m = np.mean(D50)
+m50m = np.mean(m50)
+dD50m =  multi_error2(D50m, m50m, dMu, NK, dNK)
+Drs50m = np.mean(Drs50)
+sDrs50 = np.std(Drs50/np.sqrt(4))
+dDrs50m = add_error(sDrs50, dD50m)
+print("Gennemsnitlig sand doserate for SSD50 = %.1f ± %.1f%% \n" %(Drs50m, dDrs50m))
+
+nA40 = 0.219
 dnA = 0.002
-nA = 0.141
+nA50 = 0.141
 # t = 13 - bt
-t = 18 - bt
-dt = dbt
-D = nA*K*t
-dD = multi_error3(D, NK,dNK, nA,dnA, t, dt)
-print(D, "±", dD/D*100)
-
-# print("Fejlen i målingen = ", DMu, "nC")
-### SSD40
-
-
-
-
-# drt50 = np.array([6.9, 6.8, 6.8, 6.8])
-# drs50 = np.array([])
-# drt40 = np.array([])
-# drs40 = np.array([10.3, 10.5, 10.5, 10.5, 10.6])
-# ### Fejlen i dosen 0.1 Gy - 1.0 Gy
-# dD = multi_error(D, Mu, DMu, NK, dNK)
-# dDsem = add_error(SEM, dD)
-# print("Dosen = ", D, "mGy ±", dDsem/D*100,"%")
-# # print ("Fejlen i dosen = ", dDsem, "mGy")
-# ### Ingen usikkerheder fra Pantak PMC1000 om eksponeringstid
-# print("Build-up-tiden = ", bt, " ± ", dbt, "s")
-# # print("Fejlen i build-up-tiden er = ", dbt, "s")
-#
-#
-#
-# drmean = np.mean(dr)
-# drsem = np.std(dr)/np.sqrt(len(dr))
-# print("Gennemsnitsdoseraten ± SEM =", drmean, "±", drsem)
-#
-#
-# print("Doseraten for tid ", T, "s = ", Dr)
-# print("Fejlen i den tekniske doserate = ", multi_error(Dr, Mu, DMu, NK, dNK))
-# print("Fejlen i den sande doserate = ", multi_error3(Dr, Mu, DMu, NK ,dNK,bt, dbt))
-# print("Fejlen i den sande doserate = ", multi_error(Dr, D, dDsem ,bt, dbt))
-# print()
-#
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# t = 18 - bt
+# dt = dbt
+Dr40 = nA40*K
+Dr50 = nA50*K
+# dD = multi_error3(D, NK,dNK, nA,dnA, t, dt)
+# print(D, "±", dD/D*100)
+dDr40 = multi_error2(Dr40, nA40, dnA, NK, dNK)
+dDr50 = multi_error2(Dr50, nA50, dnA, NK, dNK)
+print("Doseraten for SSD40 er generelt %.1f ± %.1f%% \n" %(Dr40, dDr40/Dr40*100))
+print("Doseraten for SSD50 er generelt %.1f ± %.1f%% \n" %(Dr50, dDr50/Dr50*100))
 
 
 # ddm = 0.002*m   # MAX4000 Repeatability
