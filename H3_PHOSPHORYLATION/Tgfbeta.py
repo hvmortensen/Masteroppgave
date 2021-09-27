@@ -11,7 +11,7 @@ D = np.array([0, 0.1, 0.2, 0.3, 0.5])
 
 H3_18 = np.loadtxt("H3-18_data.txt")
 H3_20 = np.loadtxt("H3-20_data.txt")
-M = H3_18#
+M = H3_20#
 
 ah = M[0:15][0:5]   #første 5 rækker af de første 15 rækker
 ap = M[0:15][5:10]  #næste 5 rækker af de første 15 rækker
