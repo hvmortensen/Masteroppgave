@@ -117,7 +117,7 @@ t40 = np.array([13, 22, 32, 51, 98])
 t50 = np.array([18, 33, 47, 76])
 
 bt1 = np.array([3.58, 3.27, 4.14])
-bt2 = np.array([3.34, 3.30, 2.20])
+bt2 = np.array([2.97, 3.36, 2.20])
 bt = np.mean([bt1, bt2])
 dbt = np.std([bt1, bt2])/np.sqrt(2)
 print()

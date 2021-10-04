@@ -68,7 +68,7 @@ print(al)
 
 FS = 17+3;
 FS = FS
-fs = FS  # fontsize til lengend()
+fs = FS  # fontsize til legend()
 fig, ax = plt.subplots(1,2, figsize=(13,4.8))
 
 ax[0].plot(bc,b,"bo")
@@ -161,8 +161,8 @@ axa[0].text(7,10 ,"Doser, SSD50",fontsize=FS)
 # l = p
 # c = y
 # d = u
-axa[1].plot(tl,h(tl),label="$f(t)= 0 \\Rightarrow t = %.2f$ s"%(-o/p+3))
-axa[1].plot(tl,i(tl),label="$g(t)= 0 \\Rightarrow t = %.2f$ s"%(-y/u+3))
+axa[1].plot(tl,h(tl),label="$f(t)= 0 \\Rightarrow t = %.2f$ s"%(-p/o))
+axa[1].plot(tl,i(tl),label="$g(t)= 0 \\Rightarrow t = %.2f$ s"%(-u/y))
 axa[1].plot( (u - p)/(o - y),h((u - p)/(o - y)),"k.", label="$f(t) = g(t)\\Rightarrow t = %.2f$ s"%((u - p)/(o - y)) )
 axa[1].axhline(0, linestyle='--', color='k')
 axa[1].set_xlabel("Eksponeringstid (s)",fontsize=FS)
@@ -203,18 +203,19 @@ plt.show()
 # plt.show()
 
 plex = 1.5
-fejl = 2.2
+kav = 0.31
+fejl = 2.5
 
-r1 = 40 - plex
-r2 = 50 - plex
+r1 = 40 - plex - kav
+r2 = 50 - plex - kav 
 konv = (f(20000000)*r1**2)/(g(20000000)*r2**2)
 
 print(al)
 FS = FS -3
-plt.plot(al, (f(al)*r1**2)/(g(al)*r2**2), label="$\\frac{I_1(t)\\cdot r_1^2}{I_2(t)\\cdot r_2^2}=\\frac{f(t)\\cdot (40 - 1.5cm)^2}{g(t)\\cdot (50 - 1.5cm)^2}\\approx1$")
+plt.plot(al, (f(al)*r1**2)/(g(al)*r2**2), label="$\\frac{D_{40}(t)\\cdot SSD40^2}{D_{50}(t)\\cdot SSD50^2}=\\frac{f(t)\\cdot (40 - 1.5 - 0.31)^2}{g(t)\\cdot (50 - 1.5 - 0.31)^2}\\approx1$")
 plt.axhline(konv,linestyle='--',color='red')#, label="asymptote ≈ %.3f"%konv)
 plt.tick_params(axis='both', which='major', labelsize=FS)
-plt.text(13,0.975,"asymptote ≈ %.3f"%konv,fontsize=FS )
+plt.text(12,0.972,"asymptote ≈ %.3f"%konv,fontsize=FS )
 plt.xlabel("Eksponeringstid (s)",fontsize=FS)
 plt.xticks([10,20,30,40,50,60,70,80,90,100])
 plt.legend(fontsize=(FS+2))
