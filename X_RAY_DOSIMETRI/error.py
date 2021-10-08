@@ -168,7 +168,7 @@ sDrs50 = np.std(Drs50/np.sqrt(4))
 dDrs50m = add_error(sDrs50, dD50m)
 print("Gennemsnitlig sand doserate for SSD50 = %.1f ± %.1f%% \n" %(Drs50m, dDrs50m))
 
-nA40 = 0.219
+nA40 = 0.218
 dnA = 0.002
 nA50 = 0.141
 # t = 13 - bt
@@ -183,6 +183,8 @@ dDr50 = multi_error2(Dr50, nA50, dnA, NK, dNK)
 print("Doseraten for SSD40 er generelt %.1f ± %.1f%% \n" %(Dr40, dDr40/Dr40*100))
 print("Doseraten for SSD50 er generelt %.1f ± %.1f%% \n" %(Dr50, dDr50/Dr50*100))
 
+print(9.7*0.218*K)
+print(multi_error3(9.7*0.218*K, 9.7, dbt, 0.218, 0.002, NK, dNK))
 
 # ddm = 0.002*m   # MAX4000 Repeatability
 # dddm = 0.0006*m # MAX4000 Liniarity
