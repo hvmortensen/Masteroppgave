@@ -88,24 +88,24 @@ for i in range(6):
     PS[i] = np.std([hpp[i], npp[i], ipp[i], jpp[i]])/np.sqrt(4)
 
 
-FS = 17
+FS = 17+5
 fig, ax = plt.subplots(1,4, figsize=(14,4.5),sharey="all")
-ax[0].errorbar(D, hmm, yerr=hsss, uplims=True, lolims=True, label="T47D")
-ax[0].errorbar(D, hpp, yerr=hpss, uplims=True, lolims=True, label="T47D-P")
-ax[0].text(0.05, 0.95, "Henrik", transform=ax[0].transAxes)
-ax[1].errorbar(D, nmm, yerr=nsss, uplims=True, lolims=True, label="T47D")
-ax[1].errorbar(D, npp, yerr=npss, uplims=True, lolims=True, label="T47D-P")
-ax[1].text(0.05, 0.95, "Nina", transform=ax[1].transAxes)
-ax[2].errorbar(D, imm, yerr=isss, uplims=True, lolims=True, label="T47D")
-ax[2].errorbar(D, ipp, yerr=ipss, uplims=True, lolims=True, label="T47D-P")
-ax[2].text(0.2, 0.95, "Ingunn", transform=ax[2].transAxes)
+ax[0].errorbar(D, hmm, yerr=hsss, uplims=True, lolims=True)#, label="T47D")
+ax[0].errorbar(D, hpp, yerr=hpss, uplims=True, lolims=True)#, label="T47D-P")
+ax[0].text(0.05, 0.93, "Henrik", transform=ax[0].transAxes,fontsize=FS-5)
+ax[1].errorbar(D, nmm, yerr=nsss, uplims=True, lolims=True)#, label="T47D")
+ax[1].errorbar(D, npp, yerr=npss, uplims=True, lolims=True)#, label="T47D-P")
+ax[1].text(0.05, 0.93, "Nina", transform=ax[1].transAxes,fontsize=FS-5)
+ax[2].errorbar(D, imm, yerr=isss, uplims=True, lolims=True)#, label="T47D")
+ax[2].errorbar(D, ipp, yerr=ipss, uplims=True, lolims=True)#, label="T47D-P")
+ax[2].text(0.2, 0.93, "Ingunn", transform=ax[2].transAxes,fontsize=FS-5)
 ax[3].errorbar(D, jmm, yerr=jsss, uplims=True, lolims=True, label="T47D")
 ax[3].errorbar(D, jpp, yerr=jpss, uplims=True, lolims=True, label="T47D-P")
-ax[3].text(0.05, 0.95, "Jenny", transform=ax[3].transAxes)
+ax[3].text(0.05, 0.93, "Jenny", transform=ax[3].transAxes,fontsize=FS-5)
 
 
 for i in range(4):
-    ax[i].legend(fontsize=FS-2)
+    ax[3].legend(fontsize=FS-2)
     ax[i].set_xticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
     ax[i].set_xlabel("Dosis (Gy)",fontsize=FS)
     ax[i].tick_params(axis='both', which='major', labelsize=FS)

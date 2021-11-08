@@ -64,17 +64,17 @@ for i in range(6):
     P[i] = np.mean([p10m[i], p11m[i], p23m[i]])
     PS[i] = np.std([p10m[i], p11m[i], p23m[i]])/np.sqrt(3)
 
-FS = 17+2
+FS = 17+5
 fig, ax = plt.subplots(1,3, figsize=(14,4.5),sharey="all")
 ax[0].errorbar(D, h10m, yerr=h10s, uplims=True, lolims=True)
 ax[0].errorbar(D, p10m, yerr=p10s, uplims=True, lolims=True)
-ax[0].text(0.05, 0.95, "H3-10", transform=ax[0].transAxes)
+ax[0].text(0.05, 0.95, "H3-10", transform=ax[0].transAxes,fontsize=FS-7)
 ax[1].errorbar(D, h11m, yerr=h11s, uplims=True, lolims=True)
 ax[1].errorbar(D, p11m, yerr=p11s, uplims=True, lolims=True)
-ax[1].text(0.2, 0.95, "H3-11", transform=ax[1].transAxes)
+ax[1].text(0.2, 0.95, "H3-11", transform=ax[1].transAxes,fontsize=FS-7)
 ax[2].errorbar(D, h23m, yerr=h23s, uplims=True, lolims=True, label="T47D")
 ax[2].errorbar(D, p23m, yerr=p23s, uplims=True, lolims=True, label="T47D-P")
-ax[2].text(0.05, 0.95, "H3-23", transform=ax[2].transAxes)
+ax[2].text(0.05, 0.95, "H3-23", transform=ax[2].transAxes,fontsize=FS-7)
 ax[2].legend(fontsize=FS-2)
 
 for i in range(3):
@@ -85,16 +85,18 @@ for i in range(3):
     ax[i].tick_params(axis='both', which='major', labelsize=FS)
     ax[0].set_ylabel("Mitotisk index (%)",fontsize=FS)
 plt.tight_layout()
-plt.savefig("H3-10_11_23all.pdf")
+plt.savefig("H3-10_11_23all3.pdf")
 plt.show()
 
+
+FS = 17 
 plt.errorbar(D, H, yerr=HS, uplims=True, lolims=True, label="T47D")
 plt.errorbar(D, P, yerr=PS, uplims=True, lolims=True, label="T47D-P")
 plt.xlabel("Dosis (Gy)",fontsize=FS)
 plt.ylabel("Mitotisk indeks (%)",fontsize=FS)
 plt.xticks([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
 plt.tick_params(axis='both', which='major', labelsize=FS)
-plt.legend(fontsize=FS-2)
+plt.legend(fontsize=FS)
 plt.tight_layout()
 plt.savefig("H3-10_11_23.pdf")
 plt.show()

@@ -1,0 +1,25 @@
+# H3-27 PQ/ML-analyse
+2.5 2.0 2.7 2.0 # 0.0 Gy (t)
+1.7 1.6 2.0 1.8 # 0.1 Gy (t)
+
+# H3-28 PQ/ML-analyse
+1.7 1.4 2.0 1.4 # 0.0 Gy (t)
+1.4 1.2 1.7 1.2 # 0.1 Gy (t)
+
+# H3-29 PQ/ML-analyse
+1.6 1.2 1.8 1.4 # 0.0 Gy (t)
+1.4 1.2 1.7 1.2 # 0.1 Gy (t)
+
+# H3-30 PQ/ML-analyse
+1.2 1.2 1.2 1.0 # 0.0 Gy (t)
+0.8 1.0 1.1 0.8 # 0.1 Gy (t)
+
+# H3-31 PQ/ML-analyse (Jenny)
+# Resultat uden at vide doser
+2.5 2.7 2.1 2.2 # 0.0 Gy (t)
+3.2 2.9 2.8 2.4 # 0.1 Gy (t)
+
+# H3-32 PQ/ML-analyse (Jenny)
+# Resultat uden at vide doser
+1.7 1.7 1.8 1.9 # 0.0 Gy (t)
+2.3 2.3 2.3 2.2 # 0.1 Gy (t)
