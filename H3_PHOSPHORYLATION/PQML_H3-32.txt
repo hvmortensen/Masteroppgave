@@ -1,5 +1,6 @@
 # H3-32 PQ/ML-analyse (Jenny)
 # Resultat uden at vide doser
+# T47D afvises pga alt for høj kontrol
 3.6 3.5 3.6 3.5 # 0.0 Gy
 1.9 1.8 2.0 1.8 # 0.1 Gy
 1.4 1.2 1.4 1.4 # 0.2 Gy

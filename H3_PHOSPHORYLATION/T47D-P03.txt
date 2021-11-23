@@ -61,5 +61,5 @@
 
 # H3-32 PQ/ML-analyse (Jenny)
 # Resultat uden at vide doser
-2.8 2.8 3.0 2.7 # 0.0 Gy (p)
-1.6 1.6 1.7 1.5 # 0.3 Gy (p)
+#2.8 2.8 3.0 2.7 # 0.0 Gy (p)
+#1.6 1.6 1.7 1.5 # 0.3 Gy (p)
