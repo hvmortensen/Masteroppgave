@@ -20,17 +20,20 @@ kTP = (273.15 + 37.1)/(273.15 + 24)
 def multi_error1(Z, a, da):
     return Z*da/a
 
-
 def multi_error2(Z, a, da, b, db):
     return Z*np.sqrt(( (da/a)**2 + (db/b)**2))
-
 
 def multi_error3(Z, a, da, b, db, c, dc):
     return Z*np.sqrt(( (da/a)**2 + (db/b)**2 + (dc/c)**2))
 
-
-def add_error(da, db):
+def add_error2(da, db):
     return np.sqrt(da**2 + db**2)
+
+def add_error3(da, db, dc):
+    return np.sqrt(da**2 + db**2 + dc**2)
+
+def exp_error(Z, a, da, n):
+    return Z*n*(da/a)
 
 
 ### A = SSD50
@@ -136,7 +139,7 @@ Drs40 = np.zeros(5)
 dDrs40 = np.zeros(5)
 for i in range(5):
     D40[i] = m40[i]*K
-    dD40[i] = multi_error2(D40[i], m40[i], add_error(s40[i], dMu), NK, dNK)
+    dD40[i] = multi_error2(D40[i], m40[i], add_error2(s40[i], dMu), NK, dNK)
 
     Drt40[i] = D40[i]/t40[i]
     dDrt40[i] = multi_error1(Drt40[i], D40[i], dD40[i])
@@ -152,7 +155,7 @@ m40m = np.mean(m40)
 dD40m =  multi_error2(D40m, m40m, dMu, NK, dNK)
 Drs40m = np.mean(Drs40)
 sDrs40 = np.std(Drs40/np.sqrt(len(m40)))
-dDrs40m = add_error(sDrs40, dD40m)
+dDrs40m = add_error2(sDrs40, dD40m)
 print("Gennemsnitlig sand doserate for SSD40 = %.1f ± %.1f \n" %(Drs40m, dDrs40m))
 
 
@@ -166,7 +169,7 @@ Drs50 = np.zeros(4)
 dDrs50 = np.zeros(4)
 for i in range(4):
     D50[i] = m50[i]*K
-    dD50[i] = multi_error2(D50[i], m50[i], add_error(s50[i], dMu), NK, dNK)
+    dD50[i] = multi_error2(D50[i], m50[i], add_error2(s50[i], dMu), NK, dNK)
     Drt50[i] = D50[i]/t50[i]
     dDrt50[i] = multi_error1(Drt50[i], D50[i], dD50[i])
     Drs50[i] = D50[i]/(t50[i] - bt)
@@ -179,7 +182,7 @@ m50m = np.mean(m50)
 dD50m =  multi_error2(D50m, m50m, dMu, NK, dNK)
 Drs50m = np.mean(Drs50)
 sDrs50 = np.std(Drs50/np.sqrt(len(m50)))
-dDrs50m = add_error(sDrs50, dD50m)
+dDrs50m = add_error2(sDrs50, dD50m)
 print("Gennemsnitlig sand doserate for SSD50 = %.1f ± %.1f \n" %(Drs50m, dDrs50m))
 """
 Gennemsnitlig sand doserate for SSD50 = 6.8 ± 2.6
@@ -207,7 +210,35 @@ print(multi_error3((13-bt)*0.218*K, (13-bt), dbt, 0.218, 0.002, NK, dNK))
 print((18-bt)*0.141*K)
 print(multi_error3((18-bt)*0.141*K, (18-bt), dbt, 0.141, 0.002, NK, dNK))
 
+#### FEJL I SSD_err (asymptoten fundet i doserate.py)
+SSDerr = 0.9673336329296723
+C = 150 #mm
+DC = 2 #mm
+T = 2.1 #mm
+DT = 0.2 #mm
+F = 75 #mm
+df1 = 0.2 #mm
+df2 = 3.1 #mm
+DF = add_error2(df1, df2)
 
+Z4 = 400 - (C + T + F)
+Z5 = 500 - (C + T + F)
+a = C + T + F
+da = DC + DT + DF
+DR4 = exp_error(Z4, a, da, 2)  # fejl i både Dr40 og Dr50
+DR5 = exp_error(Z5, a, da, 2)
+
+DSSDerr = multi_error2(SSDerr, Z4, DR4, Z5, DR5)
+
+print("SSD_err = %.3f ± %.3f"%(SSDerr,DSSDerr))
+
+
+#### Fejlen i SSD40 og SSD50
+
+DSSD40 = multi_error1(40*SSDerr, SSDerr, DSSDerr)
+DSSD50 = multi_error1(50*SSDerr, SSDerr, DSSDerr)
+print ("Sand SSD40 er %.2f ± %.2f"%(40*SSDerr, DSSD40))
+print ("Sand SSD50 er %.2f ± %.2f"%(50*SSDerr, DSSD50))
 
 # ddm = 0.002*m   # MAX4000 Repeatability
 # dddm = 0.0006*m # MAX4000 Liniarity

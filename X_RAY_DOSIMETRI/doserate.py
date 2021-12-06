@@ -215,7 +215,7 @@ FS = FS -3
 plt.plot(al, (f(al)*r1**2)/(g(al)*r2**2), label="$\\frac{D_{40}(t)\\cdot r_{40}^2}{D_{50}(t)\\cdot r_{50}^2}=\\frac{f(t)\\cdot (40 - 1.5 - 0.75 - 0.21)^2}{g(t)\\cdot (50 - 1.5 - 0.75 - 0.21)^2}$")
 plt.axhline(konv,linestyle='--',color='red')#, label="asymptote ≈ %.3f"%konv)
 plt.tick_params(axis='both', which='major', labelsize=FS)
-plt.text(12,0.965,"asymptote ≈ %.3f"%konv,fontsize=FS )
+plt.text(12,0.965,"asymptote = %.3f ± 0.064"%konv,fontsize=FS )
 plt.xlabel("Eksponeringstid (s)",fontsize=FS)
 plt.xticks([10,20,30,40,50,60,70,80,90,100])
 plt.legend(fontsize=(FS+2))
@@ -223,8 +223,10 @@ plt.tight_layout()
 plt.savefig("Afst_kvadr_lov.pdf")
 plt.show()
 
+print(konv)
+
 """
-asymptote = 0.967
+asymptote = 0.9673336329296723
 """
 
 

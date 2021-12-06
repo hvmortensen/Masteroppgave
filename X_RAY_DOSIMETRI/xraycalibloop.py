@@ -52,7 +52,7 @@ mpl.rcParams['font.family'] = 'Times New Roman'
 #### VÆLG TXT.-FIL SOM SKAL KØRES ####
 filename = 'xray_data_SSD50_20s.txt'; t = 20; SSD = "SSD50"
 # filename = 'xray_data_SSD40_14s.txt'; t = 14; SSD = "SSD40"
-filename = 'xray_data_SSD40_13s.txt'; t = 13; SSD = "SSD40"
+# filename = 'xray_data_SSD40_13s.txt'; t = 13; SSD = "SSD40"
 # filename = 'xray_data_SSD37_5_12s.txt'; t = 12; SSD = "SSD37_5"
 ################################################################################
 
@@ -359,6 +359,7 @@ NormArray = np.zeros((m, n*N))    # NormArray
 for i in range(n*N):                                                        # hele datasættet igennem (90 punkter)
     norm[i] = D[i]/np.mean(D[i])                                            # normaliser alle målinger ift eget punktsæt
     # norm_wi0[i] = D[i]/np.mean(D[i,1:])
+    # print("%.3f"%np.mean(D[i]))
     for j in range(m):                                                      # 5 eller 10 gange, dvs en gang pr målingsindeks
         NormArray[j,i] = norm[i,j]                                          # array med til plotting
         # norm_wi[i] = D[i]/np.mean(np.concatenate((D[i,:j], D[i,j+1:])))     # normaliser måling ift resterende målinger (ikke egen måling)
@@ -420,16 +421,17 @@ if m <= 5: #hvis kun ét forsøg
         axc[i].plot((NormArray[i][:30]-1)*100, ".")#, ".", label="norm. måling")
         axc[i].plot((NormArray[i][30:60]-1)*100, ".")
         axc[i].plot((NormArray[i][60:]-1)*100, ".")
-        axc[i].set_title("%s.-målinger"%(i+1),fontsize=FFS)
+        axc[i].set_title("%s.-målinger"%(i+1),fontsize=FFS+1)
         axc[i].legend(loc=3, fontsize=fs+1)
         axc[i].set_ylim((ylimits))
-        axc[i].set_xlabel("Målepunkt",fontsize=FFS)
-        axc[0].set_ylabel("Afvig fra gnsn (%)",fontsize=FFS)
+        axc[i].set_xlabel("Målepunkt",fontsize=FFS+1)
+        axc[0].set_ylabel("Afvig fra gnsn (%)",fontsize=FFS+1)
         axc[i].tick_params(axis='both', which='major', labelsize=FFS-1)
         a=axc[i].get_xticks().tolist()
         axc[i].set_xticks(np.array([0, 9, 19, 29]))
         a = ["$(0.0)$", "$(1,3)$", "$(3,1)$", "$(4,5)$"]
         axc[i].set_xticklabels(a)
+    axc[0].set_title("1.-målinger",fontsize=FFS+1, fontweight="bold")
 else: #hvis flere forsøg
     ylimits = (-9, 9)
     figc, axc = plt.subplots(nrows=2,ncols=5,figsize=(14, 7.5), sharey="all")
@@ -442,16 +444,17 @@ else: #hvis flere forsøg
             axc[i,j].plot((NormArray[j + i*5][:30]-1)*100, ".")#, ".", label="norm. måling")
             axc[i,j].plot((NormArray[j + i*5][30:60]-1)*100, ".")
             axc[i,j].plot((NormArray[j + i*5][60:]-1)*100, ".")
-            axc[i,j].set_title("%s.-målinger"%(j + 1 + i*5),fontsize=FFS)
+            axc[i,j].set_title("%s.-målinger"%(j + 1 + i*5),fontsize=FFS+1)
             axc[i,j].legend(loc=3, fontsize=fs+1)
             axc[i,j].set_ylim(ylimits)
-            axc[i,j].set_xlabel("Målepunkt",fontsize=FFS)
-            axc[i,0].set_ylabel("Afvig fra gnsn (%)",fontsize=FFS)
+            axc[i,j].set_xlabel("Målepunkt",fontsize=FFS+1)
+            axc[i,0].set_ylabel("Afvig fra gnsn (%)",fontsize=FFS+1)
             axc[i,j].tick_params(axis='both', which='major', labelsize=FFS-1)
             a=axc[i,j].get_xticks().tolist()
             axc[i,j].set_xticks(np.array([0, 9, 19, 29]))
             a = ["$(0.0)$", "$(1,3)$", "$(3,1)$", "$(4,5)$"]
             axc[i,j].set_xticklabels(a)
+        axc[0,0].set_title("1.-målinger",fontsize=FFS+1, fontweight="bold")
 plt.tight_layout()
 plt.savefig("%s_%s_norm_rest_alle.pdf"%(SSD,t))
 ################################################################################
@@ -486,7 +489,7 @@ plt.savefig("%s_%s_norm_rest_alle.pdf"%(SSD,t))
 # plt.tight_layout()
 # # plt.tight_layout(rect=titlecorrection)
 # plt.savefig("%s_%s_norm_rest.pdf"%(SSD,t))
-# # plt.show()
+plt.show()
 ################################################################################
 
 
@@ -499,31 +502,31 @@ scope = np.array([12, 13, 14, 20])
 avg0 = np.mean(NormArray[0])
 std0 = np.std(NormArray[0])
 sem0 = np.std(NormArray[0])/np.sqrt(len(NormArray[0]))
-# print(avg0)
-# print(std0)
-# print(sem0)
-first_meas_norms = np.array([1.0215465117895153, 1.0204540638976112, 1.0120538668226677, 1.0087396484416213 ])
-first_meas_stds = np.array([0.0353466377428203, 0.02763525154902737, 0.026603320855124565,0.016202058486188126])
-first_meas_sems = np.array([0.006453383607902055, 0.0029130112868874284, 0.002804236240881732, 0.0017078469199871408 ])
+print(avg0)
+print(std0)
+print(sem0)
+first_meas_norms = np.array([1.0215465117895153, 1.0202983310088565, 1.0120538668226677, 1.0087396484416213 ])
+first_meas_stds = np.array([0.0353466377428203, 0.02778567941797335, 0.026603320855124565,0.016202058486188126])
+first_meas_sems = np.array([0.006453383607902055, 0.002928867776535249, 0.002804236240881732, 0.0017078469199871408 ])
 
 ####Plot
-# titlee = "Kalibreringsfaktor $\\delta(t)$ for kort eksponering"
-# fige, axe = plt.subplots()
-# # axe.set_title(titlee, fontsize=FS)
-# qqq = (first_meas_norms-1)*100
-# ppp = (first_meas_sems)*100
-# axe.plot(scope,qqq, "r", label="1.-målingens gennemsnitlige afvig")
-# axe.fill_between(scope, qqq-ppp, qqq+ppp, alpha=0.3,label="SEM")
-# axe.set_xlabel("Eksponeringstid (s)",fontsize=FS)
-# axe.set_ylabel("Afvig fra gennemsnittet (%)",fontsize=FS)
-# axe.legend(fontsize = FS)
-# # axe.set_yticks([1.006, 1.008, 1.010, 1.012, 1.014, 1.016, 1.018, 1.020, 1.022, 1.024, 1.026, 1.028])
-# plt.xticks(fontsize=FS)
-# plt.yticks(fontsize=FS)
-# plt.tight_layout()
-# # plt.tight_layout(rect=titlecorrection)
-# plt.savefig("Kalib_faktor_over_tid.pdf")
-# plt.show()
+titlee = "Kalibreringsfaktor $\\delta(t)$ for kort eksponering"
+fige, axe = plt.subplots()
+# axe.set_title(titlee, fontsize=FS)
+qqq = (first_meas_norms-1)*100
+ppp = (first_meas_sems)*100
+axe.plot(scope,qqq, "r", label="1.-målingens gennemsnitlige afvig")
+axe.fill_between(scope, qqq-ppp, qqq+ppp, alpha=0.3,label="SEM")
+axe.set_xlabel("Eksponeringstid (s)",fontsize=FS)
+axe.set_ylabel("Afvig fra gennemsnittet (%)",fontsize=FS)
+axe.legend(fontsize = FS)
+# axe.set_yticks([1.006, 1.008, 1.010, 1.012, 1.014, 1.016, 1.018, 1.020, 1.022, 1.024, 1.026, 1.028])
+plt.xticks(fontsize=FS)
+plt.yticks(fontsize=FS)
+plt.tight_layout()
+# plt.tight_layout(rect=titlecorrection)
+plt.savefig("Kalib_faktor_over_tid.pdf")
+plt.show()
 ################################################################################
 
 
@@ -568,28 +571,29 @@ P_Hom_std = np.std(PS_Matrix[:,2:-1,1:-1])
 P_Hom_sem = np.std(PS_Matrix[:,2:-1,1:-1])/np.sqrt(PS_Matrix[:,2:-1,1:-1].shape[0]*PS_Matrix[:,2:-1,1:-1].shape[1])
 # print((PS_Matrix[:,2:-1,1:-1]))
 # print( PS_Matrix[:,2:-1,1:-1].shape[0]*PS_Matrix[:,2:-1,1:-1].shape[1])
-# print("P_Hom_mean =", P_Hom_mean)
-# print("P_Hom_std =", P_Hom_std)
-# print("P_Hom_sem =", P_Hom_sem)
-meanstd_hom = np.array([3.0609518709544905, 2.9058740060196473, 2.5327468220836034, 1.6194550102161929])
-stdstd_hom = np.array([0.508958148510818, 0.618839073735935, 0.6038044325544453, 0.5369453932178103])
-semstd_hom = np.array([0.29384712404897434, 0.20627969124531167, 0.2012681441848151, 0.17898179773927012])
+print("P_Hom_mean =", P_Hom_mean)
+print("P_Hom_std =", P_Hom_std)
+print("P_Hom_sem =", P_Hom_sem)
+meanstd_hom = np.array([3.0609518709544905, 2.939396263552963, 2.5327468220836034, 1.6194550102161929])
+stdstd_hom = np.array([0.508958148510818, 0.5884417584531493, 0.6038044325544453, 0.5369453932178103])
+semstd_hom = np.array([0.29384712404897434, 0.19614725281771642, 0.2012681441848151, 0.17898179773927012])
 ####PLOT
-# # titlef = "Gennemsnitligt standardafvig i det homogene felt som funktion af eksponeringstid"
-# figf, axf = plt.subplots()
-# # axe.set_title(titlee, fontsize=FS)
-# im = mpimg.imread('gitter.png')
-# axf.imshow(im, extent=[11.5,14.65,1.5,2.26], aspect='auto')
-# axf.plot(scope,meanstd_hom, label="$\\langle$SD$\\rangle(t)$")
-# axf.fill_between(scope, meanstd_hom - semstd_hom, meanstd_hom + semstd_hom,alpha=0.3,label="SEM")
-# axf.set_xlabel("Eksponeringstid (s)",fontsize=FS)
-# axf.set_ylabel("Gnsn standardafvig $\\langle$SD$\\rangle(t)$ (%)",fontsize=FS)
-# axf.legend(fontsize = FS)
-# plt.xticks(fontsize=FS)
-# plt.yticks(fontsize=FS)
-# plt.tight_layout()
-# # plt.tight_layout(rect=titlecorrection)
-# plt.savefig("Gnsn_std_afvig.pdf")
+# titlef = "Gennemsnitligt standardafvig i det homogene felt som funktion af eksponeringstid"
+figf, axf = plt.subplots()
+# axe.set_title(titlee, fontsize=FS)
+im = mpimg.imread('gitter.png')
+axf.imshow(im, extent=[11.5,14.65,1.5,2.26], aspect='auto')
+axf.plot(scope,meanstd_hom, label="$\\langle$SD$\\rangle(t)$")
+axf.fill_between(scope, meanstd_hom - semstd_hom, meanstd_hom + semstd_hom,alpha=0.3,label="SEM")
+axf.set_xlabel("Eksponeringstid (s)",fontsize=FS)
+axf.set_ylabel("Gnsn standardafvig $\\langle$SD$\\rangle(t)$ (%)",fontsize=FS)
+axf.legend(fontsize = FS)
+plt.xticks(fontsize=FS)
+plt.yticks(fontsize=FS)
+plt.tight_layout()
+# plt.tight_layout(rect=titlecorrection)
+plt.savefig("Gnsn_std_afvig.pdf")
+plt.show()
 ################################################################################
 
 
@@ -599,31 +603,31 @@ semstd_hom = np.array([0.29384712404897434, 0.20627969124531167, 0.2012681441848
 PSEM_Hom_mean = np.mean(PSEM_Matrix[2:-1,1:-1])
 PSEM_Hom_std = np.std(PSEM_Matrix[2:-1,1:-1])
 PSEM_Hom_sem = np.std(PSEM_Matrix[2:-1,1:-1])/np.sqrt(PS_Matrix[:,2:-1,1:-1].shape[0]*PS_Matrix[:,2:-1,1:-1].shape[1])
-# print("PSEM_Hom_mean =", PSEM_Hom_mean)
-# print("PSEM_Hom_std =", PSEM_Hom_std)
-# print("PSEM_Hom_sem =", PSEM_Hom_sem)
+print("PSEM_Hom_mean =", PSEM_Hom_mean)
+print("PSEM_Hom_std =", PSEM_Hom_std)
+print("PSEM_Hom_sem =", PSEM_Hom_sem)
 scope_sem = np.array([13,14,20])
-meansem_hom = np.array([0.8510225461213561,1.3031104776606717,1.5848983129957606])
-semsem_hom = np.array([0.053547249218584086,0.15708604238204218,0.07614570548795169])
+meansem_hom = np.array([0.8113162333680682,1.3031104776606717,1.5848983129957606])
+semsem_hom = np.array([0.05578176320465723,0.15708604238204218,0.07614570548795169])
 
 ####PLOT
-# # titlef = "Gennemsnitligt standardfejl i det homogene felt som funktion af eksponeringstid"
-# figh, axh = plt.subplots()
-# im = mpimg.imread('gitter.png')
-# # axh.imshow(im, extent=[17.3,20.3,1.07,1.47], aspect='auto')
-# axh.imshow(im, extent=[12.6+5,15.2+5,0.8,1.13], aspect='auto')
-# axh.plot(scope_sem,meansem_hom, "g", label="$\\langle$SEM$\\rangle(t)$")
-#
-# axh.fill_between(scope_sem, meansem_hom - semsem_hom, meansem_hom + semsem_hom,alpha=0.3,label="SEM")
-# axh.set_xlabel("Eksponeringstid (s)",fontsize=FS)
-# axh.set_ylabel("Gnsn standardfejl $\\langle$SEM$\\rangle(t)$ (%)",fontsize=FS)
-# axh.legend(fontsize = FS)
-# plt.xticks(fontsize=FS)
-# plt.yticks(fontsize=FS)
-# plt.tight_layout()
-# # plt.tight_layout(rect=titlecorrection)
-# plt.savefig("Gnsn_SEM.pdf")
-# # plt.show()
+# titlef = "Gennemsnitligt standardfejl i det homogene felt som funktion af eksponeringstid"
+figh, axh = plt.subplots()
+im = mpimg.imread('gitter.png')
+# axh.imshow(im, extent=[17.3,20.3,1.07,1.47], aspect='auto')
+axh.imshow(im, extent=[12.6+5,15.2+5,0.8,1.13], aspect='auto')
+axh.plot(scope_sem,meansem_hom, "g", label="$\\langle$SEM$\\rangle(t)$")
+
+axh.fill_between(scope_sem, meansem_hom - semsem_hom, meansem_hom + semsem_hom,alpha=0.3,label="SEM")
+axh.set_xlabel("Eksponeringstid (s)",fontsize=FS)
+axh.set_ylabel("Gnsn standardfejl $\\langle$SEM$\\rangle(t)$ (%)",fontsize=FS)
+axh.legend(fontsize = FS)
+plt.xticks(fontsize=FS)
+plt.yticks(fontsize=FS)
+plt.tight_layout()
+# plt.tight_layout(rect=titlecorrection)
+plt.savefig("Gnsn_SEM.pdf")
+plt.show()
 ################################################################################
 
 
@@ -651,5 +655,5 @@ plt.xticks(fontsize=FS)
 plt.yticks(fontsize=FS)
 plt.tight_layout()
 plt.savefig("%s_%s_m_index_gnsnafvig-fra-gnsn.pdf"%(SSD,t))
-# plt.show()
+plt.show()
 ################################################################################
